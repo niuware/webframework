@@ -9,7 +9,7 @@
 */
 namespace Niuware\WebFramework;
 
-require_once __DIR__. '/app/config/routes.php';
+require_once 'app/config/routes.php';
 
 use App\Config\Routes;
 

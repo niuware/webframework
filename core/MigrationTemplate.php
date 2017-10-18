@@ -29,6 +29,7 @@ final class MigrationTemplate extends AbstractTemplateCreation {
      */
     public function getMigrationTemplate() {
         
+        $date = date('Y/m/d H:i:s');
         $template = 
 <<<EOD
 <?php
@@ -42,6 +43,7 @@ class \$className extends \$baseClassName
      * Illuminate\Database\Schema\Builder \$schema
      * Use the \$schema object to execute your migration queries
      * 
+     * Created on $date
      * Migration comments:
      * 
      */

@@ -9,7 +9,7 @@
 */
 namespace Niuware\WebFramework;
 
-require __DIR__ . '/app/config/settings.php';
+require_once 'app/config/settings.php';
     
 /**
 * Executes the application processing the correct routing
