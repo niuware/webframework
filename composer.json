@@ -1,5 +1,5 @@
 {
-    "name": "niuware/web-framework",
+    "name": "niuware/webframework",
     "type": "library",
     "description": "Lightweight and ready to use PHP framework for developing full MVC and MVP web applications.",
     "keywords": ["framework", "php"],
