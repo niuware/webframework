@@ -21,7 +21,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Niuware\\WebFramework\\": "core"
+            "Niuware\\WebFramework\\": "src"
         }
     }
 }
