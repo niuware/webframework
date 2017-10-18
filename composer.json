@@ -1,0 +1,27 @@
+{
+    "name": "niuware/web-framework",
+    "type": "library",
+    "description": "Lightweight and ready to use PHP framework for developing full MVC and MVP web applications.",
+    "keywords": ["framework", "php"],
+    "homepage": "https://github.com/niuware/web-framework",
+    "license": "Apache-2.0",
+    "authors": [
+        {
+            "name": "Erik Lopez",
+            "email": "maileks@gmail.com",
+            "homepage": "http://niuware.github.io",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": ">=7.0.0",
+        "illuminate/database": ">=5.5",
+        "twig/twig" : ">=2.4",
+        "robmorgan/phinx" : ">=0.9"
+    },
+    "autoload": {
+        "psr-4": {
+            "Niuware\\WebFramework\\": "core"
+        }
+    }
+}
