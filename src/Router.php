@@ -412,7 +412,7 @@ class Router {
         }
         
         $viewName.= $this->getControllerAction();
-        $viewName.= '.view.twig';
+        $viewName.= '.twig';
         
         return $viewName;
     }

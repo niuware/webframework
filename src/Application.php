@@ -41,7 +41,11 @@ final class Application {
     /**
      * Initializes the application
      */
-    private function __construct() {}
+    private function __construct() {
+        
+        spl_autoload_register(null, false);
+        spl_autoload_register(__NAMESPACE__ . "\Autoloader::core");
+    }
 
     /**
     * Calls all necessary methods to execute the application
