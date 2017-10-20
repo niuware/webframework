@@ -108,6 +108,16 @@ final class HttpRequest {
     }
     
     /**
+     * Gets an HTTP header value if exists
+     * @param string $name
+     * @return string
+     */
+    public function header($name) {
+        
+        return (isset($this->headers[$name])) ? $this->headers[$name] : '';
+    }
+    
+    /**
      * Verifies if a request parameter is set
      * @param type $parameter
      * @param boolean $emptyIsValid
