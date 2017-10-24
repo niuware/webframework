@@ -36,7 +36,7 @@ class Router {
     
     private $routeAction = "";
     
-    private $routeMappedParams;
+    private $routeMappedParams = [];
     
     private $routeMode = "main";
 
