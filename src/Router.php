@@ -247,7 +247,7 @@ class Router {
 
             return $this->setRequireAdminAuthMode();
         }
-        else if ($this->path[0] === 'console:nwf') {
+        else if ($this->path[0] === 'console') {
             
             if (\App\Config\CONSOLE_MODE === 'web' || \App\Config\CONSOLE_MODE === 'enabled') {
                 
