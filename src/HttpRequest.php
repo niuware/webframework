@@ -20,6 +20,8 @@ final class HttpRequest {
     
     private $files = [];
     
+    private $app = [];
+    
     /**
      * Gets a request property
      * @param string $name
@@ -45,7 +47,7 @@ final class HttpRequest {
         $this->attributes[$name] = $value;
     }
 
-    function __construct(array $params = null, $files = null, $requestUri = null) { 
+    function __construct(array $params = null, $files = null, $requestUri = null, $app = null) { 
         
         if ($params !== null) {
             
@@ -55,6 +57,11 @@ final class HttpRequest {
         if ($files !== null) {
             
             $this->files = $files;
+        }
+        
+        if ($app !== null) {
+            
+            $this->app = $app;
         }
         
         $this->setHeaders();
@@ -115,6 +122,15 @@ final class HttpRequest {
     public function header($name) {
         
         return (isset($this->headers[$name])) ? $this->headers[$name] : '';
+    }
+    
+    /**
+     * Gets all App info
+     * @return array
+     */
+    public function app() {
+        
+        return (object)$this->app;
     }
     
     /**

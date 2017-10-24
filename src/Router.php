@@ -20,21 +20,25 @@ class Router {
 
     private $path;
 
-    private $controller;
-
-    private $action;
-    
-    private $adminPath = null;
-
     private $error = true;
-
-    private $admin = false;
     
-    private $requestMethod = null;
+    private $requestMethod;
     
     private $queryString = [];
     
     private $currentUri = "";
+    
+    private $routeRequireLogin = false;
+    
+    private $routeIsAdmin = false;
+    
+    private $routeController;
+    
+    private $routeAction = "";
+    
+    private $routeMappedParams;
+    
+    private $routeMode = "main";
 
     function __construct() {
 
@@ -57,42 +61,127 @@ class Router {
 
             $this->currentUri = str_replace('/' . \App\Config\BASE_PATH, '', filter_input(\App\Config\SERVER_ENV_VAR, 'REQUEST_URI', FILTER_SANITIZE_URL));
         }
-
-        $this->path = explode('/', $this->currentUri);
-
-        $this->action = $this->path[0];
         
-        $this->setQueryString();
+        $parsedUrl = parse_url($this->currentUri);
+        
+        $this->setQueryString($parsedUrl);
+        
+        $this->path = preg_split('/\//', $parsedUrl['path'], -1, \PREG_SPLIT_NO_EMPTY);
 
-        // If the URL is associated to a controller, then load it
-        if (isset(Routes::$views['main'][$this->path[0]])) {
+        if (!isset($this->path[1])) {
 
-            $this->redirectMain();
-
-            $this->error = false;
-
-        } else {
+            $this->path[1] = "";
+        }
+        if (!isset($this->path[2])) {
             
-            if (isset($this->path[1])) {
-                
-                $this->adminPath = str_replace("/", "", parse_url($this->path[1], \PHP_URL_PATH));
-            }
-
-            $this->redirectTask($this->path[0]);
+            $this->path[2] = "";
+        }
+        
+        $this->parseRoute();
+        
+        if ($this->routeMode === 'main' && $this->routeController !== null) {
+            
+            $this->redirectMain();
+            
+            $this->error = false;
+        }
+        else {
+            
+            $this->redirectTask();
         }
     }
     
-    private function setQueryString() {
+    private function setQueryString($parsedUrl) {
         
-        $queryString = filter_input(INPUT_SERVER, 'QUERY_STRING');
+        if (isset($parsedUrl['query'])) {
+            
+            parse_str($parsedUrl['query'], $this->queryString);
+        }
+    }
+    
+    private function parseRoute() {
         
-        if ($queryString !== "") {
+        $actionIndex = 0;
+
+        if ($this->path[0] === 'admin') {
             
-            parse_str($queryString, $this->queryString);
+            $this->routeMode = 'admin';
+            $actionIndex = 1;
+            $this->routeIsAdmin = true;
+            $this->routeRequireLogin = true;
+        }
+        else {
+
+            if (isset(Routes::$views[$this->path[0]])) {
+
+                $this->routeMode = $this->path[0];
+                $actionIndex = 1;
+            }
+        }
+
+        foreach (Routes::$views[$this->routeMode] as $route => $controller) {
+
+            $localPath = explode("/", $route);
+
+            if ($this->path[$actionIndex] === $localPath[0]) {
+                
+                $this->setController($controller);
+                
+                $this->setRouteAction($localPath, $actionIndex);
+
+                $this->setMappedParameters($localPath, $actionIndex);
+                
+                if (isset($this->routeController) && isset($this->routeAction) 
+                        && !empty($this->routeMappedParams)) {
+
+                    break;
+                }
+            }
+        }
+    }
+    
+    private function setController($controller) {
+        
+        if (isset($controller['use'])) {
+
+            $this->routeController = $controller['use'];
+        }
+        
+        if (isset($controller['login'])) {
+
+            $this->routeRequireLogin = $controller['login'];
+        }
+    }
+    
+    private function setRouteAction($path, $actionIndex) {
+        
+        if (isset($this->path[$actionIndex + 1]) && isset($path[1])) {
+
+            if ($this->path[$actionIndex + 1] === $path[1]) {
+
+                $this->routeAction = $this->path[$actionIndex + 1];
+            }
+        }
+    }
+    
+    private function setMappedParameters($path, $actionIndex) {
+        
+        if (count($path) > 2) {
             
-            $this->path[0] = str_replace(['?' . $queryString, $queryString], '', $this->path[0]);
-            
-            $this->action = $this->path[0];
+            $this->routeMappedParams = [];
+
+            $params = array_splice($path, 2);
+            $index = $actionIndex + 2;
+
+            foreach($params as $param) {
+
+                $key = str_replace(['{', '}'], '', $param);
+
+                if (isset($this->path[$index])) {
+                    
+                    $this->routeMappedParams[$key] = $this->path[$index++];
+                }
+            }
         }
     }
     
@@ -106,14 +195,17 @@ class Router {
         if ($requestMethod === 'GET') {
             
             $this->requestMethod = 'get';
+            $this->routeAction = 'index';
             
         } elseif ($requestMethod === 'POST') {
             
             $this->requestMethod = 'post';
+            $this->routeAction = 'index';
             
         } elseif ($requestMethod === 'DELETE') {
             
             $this->requestMethod = 'delete';
+            $this->routeAction = '';
         }
     }
 
@@ -121,33 +213,15 @@ class Router {
     * Executes the routing for controllers (NOT API calls or admin controllers)
     */
     private function redirectMain() {
-
-        if (!$this->requireLogin()) {
+        
+        if (!$this->routeRequireLogin) {
             
-            Auth::requireAuth(false);
-
-            $this->controller = Routes::$views['main'][$this->path[0]][0];
-
-        } else {
-
+            Auth::requireAuth(false, $this->routeMode);
+        }
+        else {
+            
             $this->setRequireAuthMode();
         }
-    }
-
-    /**
-    * Verify if the controller requires user login
-    * @return bool Login required?
-    */
-    private function requireLogin() {
-
-        $requireLogin = false;
-
-        if (isset(Routes::$views['main'][$this->path[0]][1])) {
-
-            $requireLogin = Routes::$views['main'][$this->path[0]][1];
-        }
-
-        return $requireLogin;
     }
 
     /**
@@ -155,9 +229,9 @@ class Router {
      * @param type $action
      * @return type
      */
-    private function redirectTask($action) {
+    private function redirectTask() {
 
-        if ($action === 'api') {
+        if ($this->path[0] === 'api') {
             
             $input = new HttpInput($this->requestMethod);
             
@@ -166,11 +240,11 @@ class Router {
             exit;
 
         } 
-        else if ($action === 'admin') {
+        else if ($this->path[0] === 'admin') {
 
             return $this->setRequireAdminAuthMode();
         }
-        else if ($action === 'console:nwf') {
+        else if ($this->path[0] === 'console:nwf') {
             
             if (\App\Config\CONSOLE_MODE === 'web' || \App\Config\CONSOLE_MODE === 'enabled') {
                 
@@ -186,7 +260,7 @@ class Router {
      */
     private function setRequireAdminAuthMode() {
         
-        $this->admin = true;
+//        $this->admin = true;
         
         Auth::requireAuth(true, 'admin');
         
@@ -198,7 +272,7 @@ class Router {
     */
     private function setRequireAuthMode() {
         
-        Auth::requireAuth(true);
+        Auth::requireAuth(true, $this->routeMode);
 
         $this->redirectAuthMode();
     }
@@ -211,13 +285,13 @@ class Router {
 
         if ($this->error) {
 
-            if (!$this->admin) {
-
+            if (!$this->routeIsAdmin) {
+                    
                 $this->redirectFailMain();
 
             } else {
 
-                $this->redirectFailAdmin();
+                $this->redirectFailMode();
             }
 
             header('HTTP/1.0 403 Forbidden');
@@ -231,22 +305,29 @@ class Router {
      */
     private function redirectFailMain() {
         
-        if (!empty(Routes::$views['main'])) {
-                    
-            header("Location: " . \App\Config\BASE_URL . \App\Config\HOMEPAGE);
+        if ($this->routeMode === 'main') {
             
-            exit;
+            if (!empty(Routes::$views['main'])) {
+
+                header("Location: " . \App\Config\BASE_URL . \App\Config\HOMEPAGE);
+
+                exit;
+            }
+        }
+        else {
+            
+            $this->redirectFailMode();
         }
     }
     
     /**
      * Redirects the browser to the default admin application route
      */
-    private function redirectFailAdmin() {
+    private function redirectFailMode() {
         
-        if (!empty(Routes::$views['admin'])) {
+        if (!empty(Routes::$views[$this->routeMode])) {
                     
-            header("Location: " . \App\Config\BASE_URL_ADMIN . \App\Config\HOMEPAGE_ADMIN);
+            header("Location: " . \App\Config\BASE_URL . $this->routeMode . '/' . \App\Config\HOMEPAGE);
             
             exit;
         }
@@ -257,14 +338,11 @@ class Router {
     */
     private function redirectAuthMode() {
         
-        if (!Auth::verifiedAuth()) {
-
-            $this->controller = "Login";
-            $this->path[0] = "login";
-
-        } else {
-
-            $this->controller = Routes::$views['main'][$this->path[0]][0];
+        if (!Auth::verifiedAuth($this->routeMode)) {
+            
+            $this->routeController = "Login";
+            $this->routeAction = "login";
+            
         }
 
         $this->error = false;
@@ -274,23 +352,21 @@ class Router {
      * Executes the routing for admin controllers
      */
     private function redirectAuthAdminMode() {
-
+        
         if (!Auth::verifiedAuth('admin')) {
 
-            $this->controller = "Login";
-            $this->adminPath = "login";
+            $this->routeController = "Login";
+            $this->routeAction = "login";
 
         } else {
-
-            $this->controller = "";
             
-            if ($this->adminPath !== null) {
+            if ($this->routeAction === null) {
                 
-                $this->controller = (isset(Routes::$views['admin'][$this->adminPath][0])) ? Routes::$views['admin'][$this->adminPath][0] : "";
+                $this->routeController = "";
             }
         }
 
-        $this->error = ($this->controller == "");
+        $this->error = ($this->routeController == "");
     }
 
     /**
@@ -300,8 +376,13 @@ class Router {
     public function getControllerInstance() {
 
         $controllerClass = "\App\Controllers\\";
-        $controllerClass.= ($this->admin === true) ? "Admin\\" : "";
-        $controllerClass.= $this->controller;
+        
+        if ($this->routeMode !== 'main') {
+            
+            $controllerClass.= ucfirst($this->routeMode) . "\\";
+        }
+        
+        $controllerClass.= $this->routeController;
         
         if (!class_exists($controllerClass)) {
             
@@ -327,7 +408,7 @@ class Router {
     */
     public function getControllerName() {
 
-        return $this->controller;
+        return $this->routeController;
     }
 
     /**
@@ -335,15 +416,8 @@ class Router {
      * @return type
      */
     public function getControllerAction() {
-
-        if (!$this->admin) {
-            
-            return $this->path[0];
-        }
-        else {
-            
-            return $this->adminPath;
-        }
+        
+        return $this->routeAction;
     }
 
     /**
@@ -351,19 +425,8 @@ class Router {
      * @return array
      */
     public function getControllerParams() {
-        
-        $pathParams = [];
-
-        if (!$this->admin) {
             
-            $pathParams = array_splice($this->path, 1);
-        }
-        else {
-            
-            $pathParams = array_splice($this->path, 2);
-        }
-            
-        $allParams = array_merge($pathParams, $this->queryString);
+        $allParams = array_merge($this->routeMappedParams, $this->queryString);
         
         $postParams = null;
         $postFiles = null;
@@ -377,7 +440,12 @@ class Router {
             $allParams = array_merge($allParams, $postParams);
         }
         
-        return new HttpRequest($allParams, $postFiles, $this->currentUri);
+        return new HttpRequest($allParams, $postFiles, $this->currentUri, [
+            'controller' => $this->routeController,
+            'action' => $this->routeAction,
+            'mode' => $this->routeMode,
+            'requireLogin' => $this->routeRequireLogin
+            ]);
     }
     
     /**
@@ -406,11 +474,12 @@ class Router {
         
         $viewName = '';
         
-        if ($this->admin == true) {
+        if ($this->routeMode !== 'main') {
             
-            $viewName = 'admin/';
+            $viewName = $this->routeMode . '/';
         }
         
+        $viewName.= $this->routeController . '/';
         $viewName.= $this->getControllerAction();
         $viewName.= '.twig';
         
@@ -437,15 +506,13 @@ class Router {
         
         $redirectBaseUrl = \App\Config\BASE_URL;
         $redirectPath = $path;
-        $container = 'main';
-        
-        if ($this->admin) {
             
-            $container = 'admin';
-            $redirectBaseUrl = \App\Config\BASE_URL_ADMIN;
+        if ($this->routeMode !== 'main') {
+
+            $redirectBaseUrl.= $this->routeMode . '/';
         }
             
-        if (isset(Routes::$views[$container])) {
+        if (isset(Routes::$views[$this->routeMode])) {
                 
             header("Location: " . $redirectBaseUrl . $redirectPath);
 

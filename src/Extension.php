@@ -53,21 +53,43 @@ final class Extension extends \Twig_Extension {
                 
                 $modeReal = 'main';
                 $path = \App\Config\BASE_URL;
-                $home = \App\Config\HOMEPAGE;
-                
-                if ($mode === 'admin') {
                     
-                    $modeReal = 'admin';
-                    $path = \App\Config\BASE_URL_ADMIN;
-                    $home = \App\Config\HOMEPAGE_ADMIN;
+                if ($mode !== 'main') {
+
+                    $modeReal = $mode;
+                    $path.= $mode . '/';
                 }
                 
-                $fullPath = $path . $home;
+                $fullPath = $path . \App\Config\HOMEPAGE;
                 
                 $urlAction = explode('/', $url);
+                
+                $exists = false;
+                
+                foreach (\App\Config\Routes::$views[$modeReal] as $route => $controller) {
 
-                if (isset(\App\Config\Routes::$views[$modeReal][$urlAction[0]])) {
+                    $localPath = explode("/", $route);
 
+                    if ($urlAction[0] === $localPath[0]) {
+                        
+                        $exists = true;
+
+                        if (isset($urlAction[1]) && isset($localPath[1])) {
+
+                            $exists = false;
+                            
+                            if ($urlAction[1] === $localPath[1]) {
+
+                                $exists = true;
+                            }
+                        }
+
+                        break;
+                    }
+                }
+                
+                if ($exists) {
+                    
                     $fullPath = $path . $url;
                 }
 
