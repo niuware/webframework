@@ -32,6 +32,8 @@ class Router {
     
     private $routeIsAdmin = false;
     
+    private $routeControllerPath;
+    
     private $routeController;
     
     private $routeAction = "";
@@ -125,7 +127,7 @@ class Router {
 
             if ($this->path[$actionIndex] === $localPath[0]) {
                 
-                $this->setController($controller);
+                $this->setController($controller, $localPath[0]);
                 
                 $this->setRouteAction($localPath, $actionIndex);
 
@@ -140,11 +142,12 @@ class Router {
         }
     }
     
-    private function setController($controller) {
+    private function setController($controller, $controllerPath) {
         
         if (isset($controller['use'])) {
 
             $this->routeController = $controller['use'];
+            $this->routeControllerPath = $controllerPath;
         }
         
         if (isset($controller['login'])) {
@@ -479,7 +482,7 @@ class Router {
             $viewName = $this->routeMode . '/';
         }
         
-        $viewName.= $this->routeController . '/';
+        $viewName.= $this->routeControllerPath . '/';
         $viewName.= $this->getControllerAction();
         $viewName.= '.twig';
         
