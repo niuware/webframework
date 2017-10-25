@@ -448,7 +448,7 @@ class Router {
         
         if (!class_exists($controllerClass)) {
             
-            throw new \Exception("The controller class '" . $this->getControllerName() 
+            throw new \Exception("The controller class '" . $controllerClass 
                         . "' does not exist.", 106);
         }
 
@@ -460,7 +460,7 @@ class Router {
             return $controllerObject;
         }
         
-        throw new \Exception("The controller class '" . $this->getControllerName() 
+        throw new \Exception("The controller class '" . $controllerClass 
                     . "' is not an instance of ". __NAMESPACE__ . "\Controller.", 104);
     }
 

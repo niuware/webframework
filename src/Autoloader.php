@@ -46,10 +46,10 @@ class Autoloader {
             
             $subNamespace = str_replace('\\', '', lcfirst(substr($baseNamespace, 1, $last - 1)));
             
-            if (substr($subNamespace, 0, 11) === 'controllers') {
+            if (substr($subNamespace, 0, 11) === 'Controllers') {
                 
                 self::$controllerSubspace = $subNamespace;
-                $subNamespace = 'controllers';
+                $subNamespace = 'Controllers';
             }
             
             $className = substr($class, strrpos($class, '\\') + 1);
@@ -69,7 +69,7 @@ class Autoloader {
      */
     private static function config() {
 
-        return 'app/config/';
+        return 'App/Config/';
     }
 
     /**
@@ -78,7 +78,7 @@ class Autoloader {
      */
     private static function api() {
 
-        return 'app/api/';
+        return 'App/Api/';
     }
 
     /**
@@ -87,8 +87,8 @@ class Autoloader {
      */
     private static function controllers() {
 
-        $path = 'app/controllers/';
-        $subspace = str_replace('controllers', '', self::$controllerSubspace);
+        $path = 'App/Controllers/';
+        $subspace = str_replace('Controllers', '', self::$controllerSubspace);
         
         if ($subspace !== '') {
             
@@ -104,7 +104,7 @@ class Autoloader {
      */
     private static function models() {
 
-        return 'app/models/';
+        return 'App/Models/';
     }
     
     /**
@@ -113,6 +113,6 @@ class Autoloader {
      */
     private static function helpers() {
         
-        return 'app/helpers/';
+        return 'App/Helpers/';
     }
 }
