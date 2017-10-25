@@ -104,6 +104,20 @@ class Router {
                 $actionIndex = 1;
             }
         }
+        
+        $matchingRoutes = $this->getMatchingRoutes($actionIndex);
+        
+        $this->setRouteParameters($matchingRoutes, $actionIndex);
+    }
+    
+    /**
+     * Get all matching controller routes
+     * @param type $actionIndex
+     * @return type
+     */
+    private function getMatchingRoutes($actionIndex) {
+        
+        $matchingRoutes = [];
 
         foreach (Routes::$views[$this->routeMode] as $route => $controller) {
 
@@ -111,17 +125,46 @@ class Router {
 
             if ($this->path[$actionIndex] === $localPath[0]) {
                 
+                $matchingRoutes[$route] = $controller;
+            }
+        }
+        
+        uksort($matchingRoutes, function($a, $b) {
+            
+             return strlen($b) - strlen($a);
+        });
+        
+        return $matchingRoutes;
+    }
+    
+    /**
+     * Sets controller and route parameters for the current route
+     * @param type $matchingRoutes
+     * @param type $actionIndex
+     */
+    private function setRouteParameters($matchingRoutes, $actionIndex) {
+        
+        $tmpPath = $this->path;
+        $matchingPath = implode('/', array_splice($tmpPath, $actionIndex));
+        
+        if (substr($matchingPath, -1, 1) === '/') {
+            
+            $matchingPath = substr($matchingPath, 0, -1);
+        }
+        
+        foreach ($matchingRoutes as $route => $controller) {
+            
+            $patternRaw = preg_replace('/\{(.*?)\}/', '(.*?)', $route);
+            $pattern = '/(' . str_replace('/', '\/', $patternRaw) . ')$/';
+            
+            if (preg_match($pattern, $matchingPath)) {
+                
+                $localPath = explode("/", $route);
                 $this->setController($controller, $localPath[0]);
-                
                 $this->setRouteAction($localPath, $actionIndex);
-
-                $this->setMappedParameters($localPath, $actionIndex);
+                $this->setMappedParameters($route, $matchingPath);
                 
-                if (isset($this->routeController) && isset($this->routeAction) 
-                        && !empty($this->routeMappedParams)) {
-
-                    break;
-                }
+                break;
             }
         }
     }
@@ -200,25 +243,36 @@ class Router {
     
     /**
      * Maps the route parameters if any
-     * @param type $path
-     * @param type $actionIndex
+     * @param type $route
+     * @param type $matchingPath
      */
-    private function setMappedParameters($path, $actionIndex) {
+    private function setMappedParameters($route, $matchingPath) {
         
-        if (count($path) > 2) {
-            
+        $matches = [];
+        
+        if (preg_match('/\{(.*?)\}/', $route, $matches, PREG_OFFSET_CAPTURE) > 0) {//if (count($path) > 2) {
+
             $this->routeMappedParams = [];
-
-            $params = array_splice($path, 2);
-            $index = $actionIndex + 2;
-
-            foreach($params as $param) {
-
-                $key = str_replace(['{', '}'], '', $param);
-
-                if (isset($this->path[$index])) {
+            
+            foreach ($matches as $param) {
+                
+                if (substr($param[0], 0, 1) !== '{') {
                     
-                    $this->routeMappedParams[$key] = $this->path[$index++];
+                    continue;
+                }
+                
+                $key = str_replace(['{', '}'], '', $param[0]);
+                
+                $paramString = substr($matchingPath, $param[1]);
+                $limit = strpos($paramString, '/');
+
+                if ($limit > 0) {
+                    
+                    $this->routeMappedParams[$key] = substr($paramString, 0, $limit);
+                }
+                else {
+                    
+                    $this->routeMappedParams[$key] = substr($paramString, 0); 
                 }
             }
         }
