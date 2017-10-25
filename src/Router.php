@@ -66,41 +66,25 @@ class Router {
         
         $parsedUrl = parse_url($this->currentUri);
         
-        $this->setQueryString($parsedUrl);
+        $this->setPath($parsedUrl);
         
-        $this->path = preg_split('/\//', $parsedUrl['path'], -1, \PREG_SPLIT_NO_EMPTY);
-
-        if (!isset($this->path[1])) {
-
-            $this->path[1] = "";
-        }
-        if (!isset($this->path[2])) {
-            
-            $this->path[2] = "";
-        }
+        $this->setQueryString($parsedUrl);
         
         $this->parseRoute();
         
-        if ($this->routeMode === 'main' && $this->routeController !== null) {
+        $this->redirectTask();
+        
+        if ($this->routeController !== null) {
             
             $this->redirectMain();
             
             $this->error = false;
         }
-        else {
-            
-            $this->redirectTask();
-        }
     }
     
-    private function setQueryString($parsedUrl) {
-        
-        if (isset($parsedUrl['query'])) {
-            
-            parse_str($parsedUrl['query'], $this->queryString);
-        }
-    }
-    
+    /**
+     * Set loading route parameters based on the current URL
+     */
     private function parseRoute() {
         
         $actionIndex = 0;
@@ -142,6 +126,48 @@ class Router {
         }
     }
     
+    /**
+     * Sets the path to load
+     * @param type $parsedUrl
+     */
+    private function setPath($parsedUrl) {
+        
+        if (isset($parsedUrl['path'])) {
+        
+            $this->path = preg_split('/\//', $parsedUrl['path'], -1, \PREG_SPLIT_NO_EMPTY);
+        }
+
+        if (!isset($this->path[0])) {
+
+            $this->path[0] = '';
+        }
+        if (!isset($this->path[1])) {
+
+            $this->path[1] = '';
+        }
+        if (!isset($this->path[2])) {
+            
+            $this->path[2] = '';
+        }
+    }
+    
+    /**
+     * Sets the query parameters if any
+     * @param type $parsedUrl
+     */
+    private function setQueryString($parsedUrl) {
+        
+        if (isset($parsedUrl['query'])) {
+            
+            parse_str($parsedUrl['query'], $this->queryString);
+        }
+    }
+    
+    /**
+     * Sets the controller loading name and path
+     * @param type $controller
+     * @param type $controllerPath
+     */
     private function setController($controller, $controllerPath) {
         
         if (isset($controller['use'])) {
@@ -156,6 +182,11 @@ class Router {
         }
     }
     
+    /**
+     * Sets the controller's action to load
+     * @param type $path
+     * @param type $actionIndex
+     */
     private function setRouteAction($path, $actionIndex) {
         
         if (isset($this->path[$actionIndex + 1]) && isset($path[1])) {
@@ -167,6 +198,11 @@ class Router {
         }
     }
     
+    /**
+     * Maps the route parameters if any
+     * @param type $path
+     * @param type $actionIndex
+     */
     private function setMappedParameters($path, $actionIndex) {
         
         if (count($path) > 2) {
@@ -243,10 +279,6 @@ class Router {
             exit;
 
         } 
-        else if ($this->path[0] === 'admin') {
-
-            return $this->setRequireAdminAuthMode();
-        }
         else if ($this->path[0] === 'console') {
             
             if (\App\Config\CONSOLE_MODE === 'web' || \App\Config\CONSOLE_MODE === 'enabled') {
@@ -256,18 +288,6 @@ class Router {
                 exit(nl2br($console->getResult()));
             }
         }
-    }
-    
-    /**
-     * Sets the Router as require admin authenticating mode
-     */
-    private function setRequireAdminAuthMode() {
-        
-//        $this->admin = true;
-        
-        Auth::requireAuth(true, 'admin');
-        
-        $this->redirectAuthAdminMode();
     }
 
     /**
@@ -346,21 +366,6 @@ class Router {
             $this->routeController = "Login";
             $this->routeAction = "login";
             
-        }
-
-        $this->error = false;
-    }
-    
-    /**
-     * Executes the routing for admin controllers
-     */
-    private function redirectAuthAdminMode() {
-        
-        if (!Auth::verifiedAuth('admin')) {
-
-            $this->routeController = "Login";
-            $this->routeAction = "login";
-
         } else {
             
             if ($this->routeAction === null) {
@@ -457,7 +462,7 @@ class Router {
      */
     public function isAdmin() {
         
-        return $this->admin;
+        return $this->routeIsAdmin;
     }
     
     /**

@@ -14,6 +14,8 @@ namespace Niuware\WebFramework;
 * App namespace classes independently
 */
 class Autoloader {
+    
+    private static $controllerSubspace;
 
     /**
      * Loads the requested file if exists
@@ -43,6 +45,12 @@ class Autoloader {
             $last = strrpos($baseNamespace, '\\');
             
             $subNamespace = str_replace('\\', '', lcfirst(substr($baseNamespace, 1, $last - 1)));
+            
+            if (substr($subNamespace, 0, 11) === 'controllers') {
+                
+                self::$controllerSubspace = $subNamespace;
+                $subNamespace = 'controllers';
+            }
             
             $className = substr($class, strrpos($class, '\\') + 1);
             
@@ -79,7 +87,15 @@ class Autoloader {
      */
     private static function controllers() {
 
-        return 'app/controllers/';
+        $path = 'app/controllers/';
+        $subspace = str_replace('controllers', '', self::$controllerSubspace);
+        
+        if ($subspace !== '') {
+            
+            $path.= $subspace . '/';
+        }
+        
+        return $path;
     }
 
     /**
@@ -89,15 +105,6 @@ class Autoloader {
     private static function models() {
 
         return 'app/models/';
-    }
-
-    /**
-     * Registers the autoloading for admin controller classes
-     * @param type $class Class to load
-     */
-    private static function controllersAdmin() {
-
-        return 'app/controllers/admin/';
     }
     
     /**
