@@ -117,7 +117,7 @@ abstract class Controller {
         
         $twigLoader = new \Twig_Loader_Filesystem('./public/views');
         
-        $rendererSettings['cache'] = './app/cache';
+        $rendererSettings['cache'] = './App/cache';
         
         if (\App\Config\DEBUG_MODE === true) {
             
