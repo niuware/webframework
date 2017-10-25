@@ -109,7 +109,7 @@ final class Api {
         
         if (isset($func[1]) && !empty($func[1]))
         {
-            $this->className = "App\Api\\" . $func[1];
+            $this->className = "App\Api\\" . ucfirst($func[1]);
             $this->methodName = str_replace(['-', '_'], '', $func[2]);
             
             return true;
