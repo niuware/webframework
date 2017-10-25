@@ -9,8 +9,6 @@
 */
 namespace Niuware\WebFramework;
 
-require_once 'app/config/routes.php';
-
 use App\Config\Routes;
 
 /**
@@ -76,9 +74,7 @@ class Router {
         
         if ($this->routeController !== null) {
             
-            $this->redirectMain();
-            
-            $this->error = false;
+            $this->error = $this->redirectMain();
         }
     }
     
@@ -310,10 +306,12 @@ class Router {
         if (!$this->routeRequireLogin) {
             
             Auth::requireAuth(false, $this->routeMode);
+            
+            return false;
         }
         else {
             
-            $this->setRequireAuthMode();
+            return $this->setRequireAuthMode();
         }
     }
 
@@ -351,7 +349,7 @@ class Router {
         
         Auth::requireAuth(true, $this->routeMode);
 
-        $this->redirectAuthMode();
+        return $this->redirectAuthMode();
     }
 
     /**
@@ -428,7 +426,7 @@ class Router {
             }
         }
 
-        $this->error = ($this->routeController == "");
+        return ($this->routeController == "");
     }
 
     /**

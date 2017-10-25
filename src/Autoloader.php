@@ -44,7 +44,7 @@ class Autoloader {
             
             $last = strrpos($baseNamespace, '\\');
             
-            $subNamespace = str_replace('\\', '', lcfirst(substr($baseNamespace, 1, $last - 1)));
+            $subNamespace = str_replace('\\', '', substr($baseNamespace, 1, $last - 1));
             
             if (substr($subNamespace, 0, 11) === 'Controllers') {
                 

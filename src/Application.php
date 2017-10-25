@@ -8,8 +8,6 @@
 * https://github.com/niuware/web-framework
 */
 namespace Niuware\WebFramework;
-
-require_once 'app/config/settings.php';
     
 /**
 * Executes the application processing the correct routing
