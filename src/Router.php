@@ -28,6 +28,8 @@ class Router {
     
     private $routeRequireLogin = false;
     
+    private $routeRequireCsrf = false;
+    
     private $routeIsAdmin = false;
     
     private $routeControllerPath;
@@ -215,9 +217,17 @@ class Router {
             $this->routeControllerPath = $controllerPath;
         }
         
-        if (isset($controller['login'])) {
+        if (isset($controller['require'])) {
 
-            $this->routeRequireLogin = $controller['login'];
+            if (in_array('login', $controller['require'])) {
+                
+                $this->routeRequireLogin = true;
+            }
+            
+            if (in_array('csrf', $controller['require'])) {
+                
+                $this->routeRequireCsrf = true;
+            }
         }
     }
     
@@ -500,12 +510,19 @@ class Router {
             $allParams = array_merge($allParams, $postParams);
         }
         
-        return new HttpRequest($allParams, $postFiles, $this->currentUri, [
+        $httpRequest = new HttpRequest($allParams, $postFiles, $this->currentUri, [
             'controller' => $this->routeController,
             'action' => $this->routeAction,
             'mode' => $this->routeMode,
             'requireLogin' => $this->routeRequireLogin
             ]);
+        
+        if ($this->routeRequireCsrf && !$httpRequest->hasValidCsrf()) {
+            
+            throw new FrameworkException('The request does not comply with the application CSRF token.');
+        }
+            
+        return $httpRequest;
     }
     
     /**

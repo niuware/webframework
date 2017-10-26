@@ -22,6 +22,8 @@ final class HttpRequest {
     
     private $app = [];
     
+    private $csrfValid = false;
+    
     /**
      * Gets a request property
      * @param string $name
@@ -52,6 +54,11 @@ final class HttpRequest {
         if ($params !== null) {
             
             $this->attributes = $params;
+            
+            if (isset($params['csrf_token'])) {
+                
+                $this->verifyCsrfToken($params['csrf_token']);
+            }
         }
         
         if ($files !== null) {
@@ -78,6 +85,11 @@ final class HttpRequest {
         
         $this->headers['Request-Path'] = $uri;
         $this->headers['Request-Uri'] = \App\Config\BASE_URL . $uri;
+    }
+    
+    private function verifyCsrfToken($token) {
+        
+        $this->csrfValid = Security::verifyCsrfToken($token);
     }
     
     /**
@@ -222,5 +234,14 @@ final class HttpRequest {
         }
         
         return new File();
+    }
+    
+    /**
+     * Returns if the request has a valid CSRF valid token
+     * @return type
+     */
+    public function hasValidCsrf() {
+        
+        return $this->csrfValid;
     }
 }
