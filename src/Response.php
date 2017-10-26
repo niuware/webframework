@@ -18,6 +18,14 @@ final class Response {
 
     private $error = false;
     
+    public function __construct($defaultValues = []) {
+       
+        if (!empty($defaultValues)) {
+            
+            $this->add($defaultValues, false, true);
+        }
+    }
+    
     public function __get($name) {
             
         if ($name !== 'error') {
@@ -64,7 +72,7 @@ final class Response {
      * Adds multiple values at once
      * @param array $data
      */
-    public function add(array $data, $clear = false) {
+    public function add(array $data, $clear = false, $overwriteError = false) {
         
         // Prevent error overwrite
         $saveError = $this->error;
@@ -76,10 +84,13 @@ final class Response {
         
         foreach ($data as $key => $value) {
             
-            $this->data[$key] = $value;
+            $this->{$key} = $value;
         }
         
-        $this->error = $saveError;
+        if ($overwriteError === false) {
+            
+            $this->error = $saveError;
+        }
     }
     
     /**
