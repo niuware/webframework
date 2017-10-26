@@ -519,7 +519,9 @@ class Router {
         
         if ($this->routeRequireCsrf && !$httpRequest->hasValidCsrf()) {
             
-            throw new FrameworkException('The request does not comply with the application CSRF token.');
+            header('HTTP/1.0 403 Forbidden');
+            
+            exit;
         }
             
         return $httpRequest;
