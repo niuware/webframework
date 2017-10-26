@@ -217,7 +217,7 @@ class Router {
             $this->routeControllerPath = $controllerPath;
         }
         
-        if (isset($controller['require'])) {
+        if (isset($controller['require']) && is_array($controller['require'])) {
 
             if (in_array('login', $controller['require'])) {
                 
