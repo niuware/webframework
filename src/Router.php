@@ -157,9 +157,10 @@ class Router {
             
             if (preg_match($pattern, $matchingPath)) {
                 
+                $customAction = "";
                 $localPath = explode("/", $route);
-                $this->setController($controller, $localPath[0]);
-                $this->setRouteAction($localPath, $actionIndex);
+                $this->setController($controller, $localPath[0], $customAction);
+                $this->setRouteAction($localPath, $actionIndex, $customAction);
                 $this->setMappedParameters($route, $matchingPath);
                 
                 break;
@@ -209,11 +210,21 @@ class Router {
      * @param type $controller
      * @param type $controllerPath
      */
-    private function setController($controller, $controllerPath) {
+    private function setController($controller, $controllerPath, &$customAction) {
         
         if (isset($controller['use'])) {
-
-            $this->routeController = $controller['use'];
+            
+            $customController = explode('@', $controller['use']);
+            
+            if (isset($customController[1])) {
+                
+                $this->routeController = $customController[0];
+                $customAction = $customController[1];
+            }
+            else {
+                $this->routeController = $controller['use'];
+            }
+            
             $this->routeControllerPath = $controllerPath;
         }
         
@@ -236,14 +247,19 @@ class Router {
      * @param type $path
      * @param type $actionIndex
      */
-    private function setRouteAction($path, $actionIndex) {
+    private function setRouteAction($path, $actionIndex, $customAction) {
         
         if (isset($this->path[$actionIndex + 1]) && isset($path[1])) {
 
             if ($this->path[$actionIndex + 1] === $path[1]) {
-
+                
                 $this->routeAction = $this->path[$actionIndex + 1];
             }
+        }
+        
+        if ($customAction !== "") {
+            
+            $this->routeAction = $customAction;
         }
     }
     
@@ -427,6 +443,8 @@ class Router {
             
             $this->routeController = "Login";
             $this->routeAction = "login";
+            $this->routeControllerPath = "login";
+            $this->routeRequireLogin = false;
             
         } else {
             
@@ -558,7 +576,11 @@ class Router {
             $viewName = $this->routeMode . '/';
         }
         
-        $viewName.= $this->routeControllerPath . '/';
+        if ($this->routeControllerPath !== '') {
+            
+            $viewName.= $this->routeControllerPath . '/';
+        }
+        
         $viewName.= $this->getControllerAction();
         $viewName.= '.twig';
         
