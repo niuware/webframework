@@ -71,6 +71,8 @@ final class Application {
     */
     public function console() {
         
+        $this->setLanguage();
+        
         if (\App\Config\CONSOLE_MODE === 'terminal' || \App\Config\CONSOLE_MODE === 'enabled') {
 
             $command = $_SERVER['argv'];
