@@ -15,7 +15,7 @@ namespace Niuware\WebFramework;
 */
 class Autoloader {
     
-    private static $controllerSubspace;
+    private static $subSpace;
 
     /**
      * Loads the requested file if exists
@@ -40,19 +40,18 @@ class Autoloader {
         
         if (substr($class, 0, 20) !== __NAMESPACE__) {
             
-            $baseNamespace = str_replace('App', '', $class);
+            $namespacePath = explode("\\", $class);
             
-            $last = strrpos($baseNamespace, '\\');
+            $subNamespace = (isset($namespacePath[1])) ? $namespacePath[1] : "";
+                        
+            $className = (isset($namespacePath[2])) ? $namespacePath[2] : "";
             
-            $subNamespace = str_replace('\\', '', substr($baseNamespace, 1, $last - 1));
+            self::$subSpace = (isset($namespacePath[3])) ? $namespacePath[2] : "";
             
-            if (substr($subNamespace, 0, 11) === 'Controllers') {
+            if (!empty(self::$subSpace)) {
                 
-                self::$controllerSubspace = $subNamespace;
-                $subNamespace = 'Controllers';
+                $className = $namespacePath[3];
             }
-            
-            $className = substr($class, strrpos($class, '\\') + 1);
             
             if (method_exists(get_called_class(), $subNamespace)) {
             
@@ -78,7 +77,15 @@ class Autoloader {
      */
     private static function api() {
 
-        return 'App/Api/';
+        $path = 'App/Api/';
+        $subspace = str_replace('Api', '', self::$subSpace);
+        
+        if ($subspace !== '') {
+            
+            $path.= $subspace . '/';
+        }
+        
+        return $path;
     }
 
     /**
@@ -88,7 +95,7 @@ class Autoloader {
     private static function controllers() {
 
         $path = 'App/Controllers/';
-        $subspace = str_replace('Controllers', '', self::$controllerSubspace);
+        $subspace = str_replace('Controllers', '', self::$subSpace);
         
         if ($subspace !== '') {
             

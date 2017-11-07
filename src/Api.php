@@ -34,6 +34,8 @@ final class Api {
     private $outputOpts;
     
     private $outputDepth;
+    
+    private $versionNamespace;
 
     function __construct($requestMethod) {
         
@@ -105,17 +107,41 @@ final class Api {
 
         $func = $this->actionPath($this->currentUri['path']);
         
-        $this->setGetMethod($func);
+        $offset = $this->setVersionNamespace($func);
         
-        if (isset($func[1]) && !empty($func[1]))
+        $this->setGetMethod($func, $offset);
+        
+        if (isset($func[1 + $offset]) && !empty($func[1 + $offset]))
         {
-            $this->className = "App\Api\\" . ucfirst($func[1]);
-            $this->methodName = str_replace(['-', '_'], '', $func[2]);
+            $this->className = "App\Api\\";
+            
+            if ($this->versionNamespace !== null) {
+                
+                $this->className.= ucfirst($this->versionNamespace) . "\\";
+            }
+            
+            $this->className.= ucfirst($func[1 + $offset]);
+            $this->methodName = str_replace(['-', '_'], '', $func[2 + $offset]);
             
             return true;
         }
         
         return false;
+    }
+    
+        
+    private function setVersionNamespace($func) {
+        
+        $matches = [];
+        
+        if (isset($func[1]) && preg_match("/^(v\d+\.\d+\.\d+)$/", $func[1], $matches)) {
+            
+            $this->versionNamespace = str_replace(".", "", $matches[0]);
+            
+            return 1;
+        }
+        
+        return 0;
     }
 
     /**
@@ -254,13 +280,13 @@ final class Api {
     /**
      * Sets a value to the requested method if not set
      * @param array $func Source path array
-     * @param int $index Index to set
+     * @param int $offset Offset of index to set
      */
-    private function setGetMethod(array &$func) {
+    private function setGetMethod(array &$func, $offset) {
         
-        if (!isset($func[2])) {
+        if (!isset($func[2 + $offset])) {
             
-            $func[2] = "";
+            $func[2 + $offset] = "";
         }
     }
 
