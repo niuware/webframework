@@ -23,6 +23,8 @@ final class Api {
 
     private $className;
     
+    private $baseClassName;
+    
     private $methodName;
     
     private $currentUri;
@@ -45,7 +47,7 @@ final class Api {
         $this->requestMethod = $requestMethod;
         $this->methodResponse = [];
         $this->rendered = false;
-        $this->params = new HttpRequest();
+        $this->params = new HttpRequest(['params' => [], 'files' => null, 'requestUri' => null, 'app' => []]);
         
         register_shutdown_function(function() {
             
@@ -116,6 +118,7 @@ final class Api {
         if (isset($func[1 + $offset]) && !empty($func[1 + $offset]))
         {
             $this->className = "App\Api\\";
+            $this->baseClassName = ucfirst($func[1 + $offset]);
             
             if ($this->versionNamespace !== null) {
                 
@@ -297,11 +300,16 @@ final class Api {
      * @param array $params Method arguments
      * @param array $files PHP $_FILES 
      */
-    public function postApi($params, $files = null) {
+    public function postApi($params, $files = null, $input) {
         
         if ($this->initialize()) {
             
-            $this->params = new HttpRequest($params, $files, $this->currentUri);
+            $this->params = $input->getRequestInstance($this->baseClassName, $this->methodName, "api", [
+                            'params' => $params,
+                            'files' => $files,
+                            'requestUri' => $this->currentUri,
+                            'app' => []
+                        ]);
 
             $this->start();
         }
@@ -310,7 +318,7 @@ final class Api {
     /**
      * Executes a GET API call
      */
-    public function getApi() {
+    public function getApi($input) {
 
         if ($this->initialize()) {
         
@@ -321,7 +329,12 @@ final class Api {
 
                 parse_str($this->currentUri['query'], $params);
 
-                $this->params = new HttpRequest($params, null, $this->currentUri);
+                $this->params = $input->getRequestInstance($this->baseClassName, $this->methodName, "api", [
+                            'params' => $params,
+                            'files' => null,
+                            'requestUri' => $this->currentUri,
+                            'app' => []
+                        ]);
             }
 
             $this->start();

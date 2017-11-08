@@ -82,11 +82,11 @@ final class HttpInput {
             
             $this->parse($data, $files);
             
-            $api->postApi($data, $files);
+            $api->postApi($data, $files, $this);
 
         } elseif ($this->requestMethod === 'get') {
 
-            $api->getApi();
+            $api->getApi($this);
         }
         else {
             
@@ -94,5 +94,70 @@ final class HttpInput {
             
             exit;
         }
+    }
+    
+    /**
+     * Gets the Request instance for the current Http request
+     * @param type $controller
+     * @param type $action
+     * @param type $subSpace
+     * @param array $params
+     * @return \Niuware\WebFramework\Http\HttpRequest
+     * @throws \Exception
+     */
+    public function getRequestInstance($controller, $action, $subSpace, array $params) {
+        
+        if (empty($params)) {
+            
+            $params = ['params' => null, 'files' => null, 'requestUri' => null, 'app' => null];
+        }
+        
+        $requestClass = $this->getRequestClassName($controller, $action, $subSpace);
+        
+        if (class_exists($requestClass)) {
+            
+            if (get_parent_class($requestClass) !== 'Niuware\WebFramework\Http\Request') {
+                
+                throw new \Exception("The class " . $requestClass . " does not inherit from Niuware\WebFramework\Http\Request class.");
+            } 
+            
+            $implements = class_implements($requestClass);
+        
+            if (!in_array('Niuware\WebFramework\Http\RequestInterface', $implements)) {
+                
+                throw new \Exception("The class " . $requestClass . " does not implements the Niuware\WebFramework\Http\RequestInterface interface.");
+            }
+            
+            $requestObj = new $requestClass($params, $this->requestMethod);
+        }
+        else {
+            
+            $requestObj = new HttpRequest($params, $this->requestMethod);
+        }
+        
+        $requestObj->validate();
+        
+        return $requestObj;
+    }
+    
+    /**
+     * Gets the Request class name
+     * @param type $controller
+     * @param type $action
+     * @param type $subSpace
+     * @return string
+     */
+    private function getRequestClassName($controller, $action, $subSpace) {
+        
+        $requestClass = "\App\Requests\\";
+        
+        if ($subSpace !== 'main') {
+            
+            $requestClass.= ucfirst($subSpace) . "\\";
+        }
+        
+        $requestClass.= $controller . $action . 'Request';
+        
+        return $requestClass;
     }
 }

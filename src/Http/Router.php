@@ -274,7 +274,7 @@ class Router {
         
         $matches = [];
         
-        if (preg_match('/\{(.*?)\}/', $route, $matches, PREG_OFFSET_CAPTURE) > 0) {//if (count($path) > 2) {
+        if (preg_match('/\{(.*?)\}/', $route, $matches, PREG_OFFSET_CAPTURE) > 0) {
 
             $this->routeMappedParams = [];
             
@@ -354,7 +354,7 @@ class Router {
             
             $input = new HttpInput($this->requestMethod);
             
-            $input->withApi();
+            $input->withApi($this->routeController, $this->getFilteredControllerAction(), $this->currentUri);
 
             exit;
 
@@ -502,12 +502,21 @@ class Router {
     }
 
     /**
-     * Gets the controller action (method to execute)
+     * Gets the controller action name (method to execute)
      * @return type
      */
     public function getControllerAction() {
         
         return $this->routeAction;
+    }
+    
+    /**
+     * Gets the controller action name without hyphens
+     * @return type
+     */
+    public function getFilteredControllerAction() {
+        
+        return str_replace(['-', '_'], '', $this->routeAction);
     }
 
     /**
@@ -530,13 +539,18 @@ class Router {
             $allParams = array_merge($allParams, $postParams);
         }
         
-        $httpRequest = new HttpRequest($allParams, $postFiles, $this->currentUri, [
-            'controller' => $this->routeController,
-            'action' => $this->routeAction,
-            'mode' => $this->routeMode,
-            'requireLogin' => $this->routeRequireLogin
-            ]);
-        
+        $httpRequest = $input->getRequestInstance($this->routeController, $this->getFilteredControllerAction(), $this->routeMode, [
+                            'params' => $allParams,
+                            'files' => $postFiles,
+                            'requestUri' => $this->currentUri,
+                            'app' => [
+                                'controller' => $this->routeController,
+                                'action' => $this->routeAction,
+                                'mode' => $this->routeMode,
+                                'requireLogin' => $this->routeRequireLogin
+                            ]
+                        ]);
+
         if ($this->routeRequireCsrf && !$httpRequest->hasValidCsrf()) {
             
             header('HTTP/1.0 403 Forbidden');

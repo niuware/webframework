@@ -64,7 +64,7 @@ class Autoloader {
     
     /**
      * Registers the autoloading for configuration classes
-     * @param type $class Class to load
+     * @return string Path to the class
      */
     private static function config() {
 
@@ -73,7 +73,7 @@ class Autoloader {
 
     /**
      * Registers the autoloading for API classes
-     * @param type $class Class to load
+     * @return string Path to the class
      */
     private static function api() {
 
@@ -90,7 +90,7 @@ class Autoloader {
 
     /**
      * Registers the autoloading for controller classes
-     * @param type $class Class to load
+     * @return string Path to the class
      */
     private static function controllers() {
 
@@ -107,7 +107,7 @@ class Autoloader {
 
     /**
      * Registers the autoloading for model classes
-     * @param type $class Class to load
+     * @return string Path to the class
      */
     private static function models() {
 
@@ -116,10 +116,27 @@ class Autoloader {
     
     /**
      * Registers the autoloading for helper classes
-     * @param type $class Class to load
+     * @return string Path to the class
      */
     private static function helpers() {
         
         return 'App/Helpers/';
+    }
+    
+    /**
+     * Registers the autoloading for request classes
+     * @return string Path to the class
+     */
+    private static function requests() {
+        
+        $path = 'App/Requests/';
+        $subspace = str_replace('Requests', '', self::$subSpace);
+        
+        if ($subspace !== '') {
+            
+            $path.= $subspace . '/';
+        }
+        
+        return $path;
     }
 }
