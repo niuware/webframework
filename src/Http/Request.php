@@ -58,10 +58,10 @@ abstract class Request {
 
     function __construct(array $params, $method = "") {
         
-        $parameters = $params['params'];
-        $files = $params['files'];
-        $requestUri = $params['requestUri'];
-        $app = $params['app'];
+        $parameters = (isset($params['params'])) ? $params['params'] : [];
+        $files = (isset($params['files'])) ? $params['files'] : null;
+        $requestUri = (isset($params['requestUri'])) ? $params['requestUri'] : null;
+        $app = (isset($params['app'])) ? $params['app'] : [];
         
         $this->method = $method;
         

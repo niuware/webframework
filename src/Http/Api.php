@@ -47,7 +47,7 @@ final class Api {
         $this->requestMethod = $requestMethod;
         $this->methodResponse = [];
         $this->rendered = false;
-        $this->params = new HttpRequest(['params' => [], 'files' => null, 'requestUri' => null, 'app' => []]);
+        $this->params = new HttpRequest([]);
         
         register_shutdown_function(function() {
             
