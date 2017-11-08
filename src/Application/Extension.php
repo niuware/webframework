@@ -7,7 +7,9 @@
 * GIT repository at:
 * https://github.com/niuware/web-framework
 */
-namespace Niuware\WebFramework;
+namespace Niuware\WebFramework\Application;
+
+use Niuware\WebFramework\Auth\Security;
 
 if (!class_exists('\Twig_Extension')) {
     

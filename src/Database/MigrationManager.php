@@ -7,7 +7,9 @@
 * GIT repository at:
 * https://github.com/niuware/web-framework
 */
-namespace Niuware\WebFramework;
+namespace Niuware\WebFramework\Database;
+
+use Niuware\WebFramework\Auth\Security;
 
 use App\Config\Settings;
 
@@ -89,7 +91,7 @@ final class MigrationManager {
                 'migrations' => 'App/Migrations/Migrations',
                 'seeds' => 'App/Migrations/Seeds'
             ],
-            'migration_base_class' => 'Niuware\WebFramework\Migration',
+            'migration_base_class' => 'Niuware\WebFramework\Database\Migration',
             'environments' => [
                 'default_migration_table' => 'migrations_log',
                 'default_database' => Settings::$databases['default']['schema'],
@@ -135,7 +137,7 @@ final class MigrationManager {
         $command = [
             'command' => 'create',
             'name' => 'V' . time(),
-            '--class' => 'Niuware\WebFramework\MigrationTemplate'
+            '--class' => 'Niuware\WebFramework\Database\MigrationTemplate'
         ];
         
         $arrayInput = new ArrayInput($command);

@@ -1,6 +1,6 @@
 <?php
 
-namespace Niuware\WebFramework;
+namespace Niuware\WebFramework\Application;
 
 final class Helper {
     

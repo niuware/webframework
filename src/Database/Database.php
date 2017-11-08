@@ -7,7 +7,7 @@
 * GIT repository at:
 * https://github.com/niuware/web-framework
 */
-namespace Niuware\WebFramework;
+namespace Niuware\WebFramework\Database;
 
 use App\Config\Settings;
 use Illuminate\Database\Capsule\Manager as Capsule;

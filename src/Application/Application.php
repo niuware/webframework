@@ -7,7 +7,12 @@
 * GIT repository at:
 * https://github.com/niuware/web-framework
 */
-namespace Niuware\WebFramework;
+namespace Niuware\WebFramework\Application;
+
+use Niuware\WebFramework\Auth\Auth;
+use Niuware\WebFramework\Http\Router;
+use Niuware\WebFramework\Database\Database;
+use Niuware\WebFramework\Exception\FrameworkException;
     
 /**
 * Executes the application processing the correct routing

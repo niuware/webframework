@@ -7,7 +7,9 @@
 * GIT repository at:
 * https://github.com/niuware/web-framework
 */
-namespace Niuware\WebFramework;
+namespace Niuware\WebFramework\Http;
+
+use Niuware\WebFramework\Auth\Auth;
 
 use App\Config\Routes;
 
@@ -361,7 +363,7 @@ class Router {
             
             if (\App\Config\CONSOLE_MODE === 'web' || \App\Config\CONSOLE_MODE === 'enabled') {
                 
-                $console = new Console($this->path, 'web');
+                $console = new \Niuware\WebFramework\Application\Console($this->path, 'web');
 
                 exit(nl2br($console->getResult()));
             }
@@ -481,13 +483,13 @@ class Router {
         $controllerObject = new $controllerClass;
         
         if (is_object($controllerObject) && 
-                get_parent_class($controllerObject) == __NAMESPACE__ . '\Controller') {
+                get_parent_class($controllerObject) ==  'Niuware\WebFramework\Application\Controller') {
             
             return $controllerObject;
         }
         
         throw new \Exception("The controller class '" . $controllerClass 
-                    . "' is not an instance of ". __NAMESPACE__ . "\Controller.", 104);
+                    . "' is not an instance of Niuware\WebFramework\Application\Controller.", 104);
     }
 
     /**

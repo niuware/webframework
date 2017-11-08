@@ -7,7 +7,7 @@
 * GIT repository at:
 * https://github.com/niuware/web-framework
 */
-namespace Niuware\WebFramework;
+namespace Niuware\WebFramework\Application;
 
 /**
 * Defines static methods for autoloading 
@@ -38,7 +38,7 @@ class Autoloader {
      */
     public static function core($class) {
         
-        if (substr($class, 0, 20) !== __NAMESPACE__) {
+        if (substr($class, 0, 20) !== "Niuware\WebFramework") {
             
             $namespacePath = explode("\\", $class);
             

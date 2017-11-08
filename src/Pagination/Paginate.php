@@ -7,9 +7,9 @@
 * GIT repository at:
 * https://github.com/niuware/web-framework
 */
-namespace Niuware\WebFramework;
+namespace Niuware\WebFramework\Pagination;
 
-use Niuware\WebFramework\HttpRequest;
+use Niuware\WebFramework\Http\HttpRequest;
 use Illuminate\Database\Eloquent\Collection;
 
 /**

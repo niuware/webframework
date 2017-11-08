@@ -7,7 +7,7 @@
 * GIT repository at:
 * https://github.com/niuware/web-framework
 */
-namespace Niuware\WebFramework;
+namespace Niuware\WebFramework\Database;
 
 use Phinx\Migration\AbstractTemplateCreation;
 use Symfony\Component\Console\Input\InputInterface;
