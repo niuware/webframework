@@ -40,6 +40,8 @@ class Router {
     
     private $routeAction = "";
     
+    private $routeRequest = "";
+    
     private $routeMappedParams = [];
     
     private $routeMode = "main";
@@ -230,6 +232,17 @@ class Router {
             $this->routeControllerPath = $controllerPath;
         }
         
+        $this->setControllerRequirements($controller);
+        
+        $this->setControllerRequest($controller);
+    }
+    
+    /**
+     * Sets the controller require attributes if any
+     * @param type $controller
+     */
+    private function setControllerRequirements($controller) {
+        
         if (isset($controller['require']) && is_array($controller['require'])) {
 
             if (in_array('login', $controller['require'])) {
@@ -241,6 +254,18 @@ class Router {
                 
                 $this->routeRequireCsrf = true;
             }
+        }
+    }
+    
+    /**
+     * Sets the custom controller Request class if any
+     * @param type $controller
+     */
+    private function setControllerRequest($controller) {
+        
+        if (isset($controller['request'])) {
+            
+            $this->routeRequest = $controller['request'];
         }
     }
     
@@ -549,7 +574,7 @@ class Router {
                                 'mode' => $this->routeMode,
                                 'requireLogin' => $this->routeRequireLogin
                             ]
-                        ]);
+                        ], $this->routeRequest);
 
         if ($this->routeRequireCsrf && !$httpRequest->hasValidCsrf()) {
             

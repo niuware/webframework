@@ -105,14 +105,14 @@ final class HttpInput {
      * @return \Niuware\WebFramework\Http\HttpRequest
      * @throws \Exception
      */
-    public function getRequestInstance($controller, $action, $subSpace, array $params) {
+    public function getRequestInstance($controller, $action, $subSpace, array $params, $defaultRequestClass = "") {
         
         if (empty($params)) {
             
             $params = ['params' => null, 'files' => null, 'requestUri' => null, 'app' => null];
         }
         
-        $requestClass = $this->getRequestClassName($controller, $action, $subSpace);
+        $requestClass = $this->getRequestClassName($controller, $action, $subSpace, $defaultRequestClass);
         
         if (class_exists($requestClass)) {
             
@@ -147,7 +147,7 @@ final class HttpInput {
      * @param type $subSpace
      * @return string
      */
-    private function getRequestClassName($controller, $action, $subSpace) {
+    private function getRequestClassName($controller, $action, $subSpace, $defaultRequestClass) {
         
         $requestClass = "\App\Requests\\";
         
@@ -156,7 +156,14 @@ final class HttpInput {
             $requestClass.= ucfirst($subSpace) . "\\";
         }
         
-        $requestClass.= $controller . $action . 'Request';
+        if ($defaultRequestClass === "") {
+            
+            $requestClass.= $controller . $action . 'Request';
+        }
+        else {
+            
+            $requestClass.= $defaultRequestClass;
+        }
         
         return $requestClass;
     }
