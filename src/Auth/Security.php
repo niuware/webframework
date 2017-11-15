@@ -86,11 +86,24 @@ class Security {
         
         if ($data === null) {
             
-            return hash_equals(Auth::get('token', 'csrf'), $token);
+            $session = Auth::get('token', 'csrf');
+            
+            if ($session !== null) {
+            
+                return hash_equals(Auth::get('token', 'csrf'), $token);
+            }
+        }
+        else {
+            $session = Auth::get('token2', 'csrf');
+
+            if ($session !== null) {
+
+                $hash = hash_hmac('sha256', $data, Auth::get('token2', 'csrf'));
+
+                return hash_equals($hash, $token);
+            }
         }
         
-        $hash = hash_hmac('sha256', $data, Auth::get('token2', 'csrf'));
-        
-        return hash_equals($hash, $token);
+        return false;
     }
 }
