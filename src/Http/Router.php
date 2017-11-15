@@ -89,7 +89,7 @@ class Router {
      */
     private function parseRoute() {
         
-        $parser = new RouteParser($this->path);
+        $parser = new RouteParser($this->path, $this->requestMethod);
         
         $parser->parse();
         

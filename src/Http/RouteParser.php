@@ -36,9 +36,12 @@ final class RouteParser {
     
     private $routeMode = "main";
     
-    function __construct($path) {
+    private $method = "";
+    
+    function __construct($path, $method) {
         
         $this->path = $path;
+        $this->method = $method;
     }
     
     /**
@@ -196,14 +199,54 @@ final class RouteParser {
         
         if (isset($controller['require']) && is_array($controller['require'])) {
 
-            if (in_array('login', $controller['require'])) {
+            if (in_array('login', $controller['require']) || 
+                    key_exists('login', $controller['require'])) {
                 
-                $this->routeRequireLogin = true;
+                $this->setLoginOptions($controller['require']['login']);
             }
             
-            if (in_array('csrf', $controller['require'])) {
+            if (in_array('csrf', $controller['require']) || 
+                    key_exists('csrf', $controller['require'])) {
+                
+                $this->setCsrfOptions($controller['require']['csrf']);
+            }
+        }
+    }
+    
+    private function setLoginOptions($loginOptions) {
+        
+        if ($loginOptions === null || $loginOptions === true) {
+
+            $this->routeRequireLogin = true;
+        }
+        else if ($loginOptions === false) {
+            
+            $this->routeRequireLogin = false;
+        }
+    }
+    
+    private function setCsrfOptions($csrfOptions) {
+
+        if (!is_array($csrfOptions)) {
+
+            if($csrfOptions === null || $csrfOptions === true) {
                 
                 $this->routeRequireCsrf = true;
+            }
+        }
+        else {
+
+            if (in_array('get', $csrfOptions) && $this->method === 'get') {
+
+                 $this->routeRequireCsrf = true;
+            }
+            if (in_array('post', $csrfOptions) && $this->method === 'post') {
+
+                 $this->routeRequireCsrf = true;
+            }
+            if (in_array('delete', $csrfOptions) && $this->method === 'delete') {
+
+                 $this->routeRequireCsrf = true;
             }
         }
     }
