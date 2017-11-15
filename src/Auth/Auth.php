@@ -100,7 +100,7 @@ final class Auth {
      * @param type $mode Type of session (either 'main', or 'admin')
      * @return type
      */
-    public static function has($name, $mode = 'main') {
+    public static function has($name = '', $mode = 'main') {
         
         return isset($_SESSION['nwf_user_' . $mode . '_' . $name . '_' . session_id()]);
     }
@@ -110,7 +110,7 @@ final class Auth {
      * @param string $name
      * @param type $mode Type of session (either 'main', or 'admin')
      */
-    public static function remove($name, $mode = 'main') {
+    public static function remove($name = '', $mode = 'main') {
         
         unset($_SESSION['nwf_user_' . $mode . '_' . $name . '_' . session_id()]);
     }

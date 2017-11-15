@@ -79,6 +79,11 @@ class Security {
      */
     public static function verifyCsrfToken($token, $data = null) {
         
+        if (empty($token)) {
+            
+            return false;
+        }
+        
         if ($data === null) {
             
             return hash_equals(Auth::get('token', 'csrf'), $token);
