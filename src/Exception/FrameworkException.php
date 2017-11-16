@@ -14,6 +14,8 @@ namespace Niuware\WebFramework\Exception;
 */
 final class FrameworkException extends \Exception {
     
+    private $customTrace = null;
+    
     public function __construct($message, $code = 0, \Throwable $previous = null) {
         
         parent::__construct($message, $code, $previous);
@@ -22,6 +24,33 @@ final class FrameworkException extends \Exception {
     public function __toString() {
         
         return "WebFramework Exception: {$this->message}\n";
+    }
+    
+    /**
+     * Sets the line where the exception was thrown
+     * @param type $line
+     */
+    public function setLine($line) {
+        
+        $this->line = $line;
+    }
+    
+    /**
+     * Sets the file where the exception was thrown
+     * @param type $file
+     */
+    public function setFile($file) {
+        
+        $this->file = $file;
+    }
+    
+    /**
+     * Sets a custom trace
+     * @param type $trace
+     */
+    public function setTrace($trace) {
+        
+        $this->customTrace = $trace;
     }
     
     /**
@@ -117,7 +146,13 @@ EOD;
         </div>
 EOD;
         if (\App\Config\DEBUG_MODE === true) {
-            $template.= nl2br($exception->getTraceAsString());
+            
+            if ($this->customTrace === null) {
+                $template.= nl2br($exception->getTraceAsString());
+            }
+            else {
+                $template.= nl2br($this->customTrace);
+            }
         }
         else {
             $template.= 'The trace is only visible when "debug mode" is enabled.';

@@ -62,6 +62,11 @@ final class Application {
         $this->router = new Router();
         
         try {
+            
+            register_shutdown_function(function() {
+
+                $this->shutdown(error_get_last());
+            });
 
             $this->start();
         }
@@ -218,5 +223,36 @@ final class Application {
         $this->controller->view = $this->router->getDefaultView();
 
         $this->loadController();
+    }
+    
+    /**
+     * Renders the shutdown exception if any
+     * @param type $error
+     */
+    private function shutdown($error) {
+        
+        if ($error !== null && is_array($error)) {
+            
+            $trace = null;
+            
+            if (($trace = strpos($error['message'], "Stack trace:")) !== false) {
+                
+                $message = substr($error['message'], 0, strpos($error['message'], "Stack trace:"));
+                
+                $trace = substr($error['message'], strpos($error['message'], "Stack trace:"));
+            }
+            else {
+                
+                $message = $error['message'];
+            }
+
+            $exception = new FrameworkException($message, $error['type']);
+
+            $exception->setLine($error['line']);
+            $exception->setFile($error['file']);
+            $exception->setTrace($trace);
+
+            $exception->renderAll();
+        }
     }
 }
