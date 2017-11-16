@@ -202,18 +202,29 @@ final class RouteParser {
             if (in_array('login', $controller['require']) || 
                     key_exists('login', $controller['require'])) {
                 
-                $this->setLoginOptions($controller['require']['login']);
+                $this->setLoginOptions($controller['require']);
             }
             
             if (in_array('csrf', $controller['require']) || 
                     key_exists('csrf', $controller['require'])) {
                 
-                $this->setCsrfOptions($controller['require']['csrf']);
+                $this->setCsrfOptions($controller['require']);
             }
         }
     }
     
-    private function setLoginOptions($loginOptions) {
+    /**
+     * Sets the login options for the route
+     * @param type $options
+     */
+    private function setLoginOptions($options) {
+        
+        $loginOptions = null;
+        
+        if (isset($options['login'])) {
+            
+            $loginOptions = $options['login'];
+        }
         
         if ($loginOptions === null || $loginOptions === true) {
 
@@ -225,7 +236,18 @@ final class RouteParser {
         }
     }
     
-    private function setCsrfOptions($csrfOptions) {
+    /**
+     * Sets the CSRF validation options for the route
+     * @param type $options
+     */
+    private function setCsrfOptions($options) {
+        
+        $csrfOptions = null;
+        
+        if (isset($options['csrf'])) {
+            
+            $csrfOptions = $options['csrf'];
+        }
 
         if (!is_array($csrfOptions)) {
 
