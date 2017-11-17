@@ -9,7 +9,7 @@
 */
 namespace Niuware\WebFramework\Pagination;
 
-use Niuware\WebFramework\Http\HttpRequest;
+use Niuware\WebFramework\Http\Request;
 use Illuminate\Database\Eloquent\Collection;
 
 /**
@@ -239,7 +239,7 @@ final class Paginate {
      * @param Illuminate\Database\Eloquent\Collection $data
      * @param HttpRequest $request
      */
-    public function paginate(Collection $data, HttpRequest $request) {
+    public function paginate(Collection $data, Request $request) {
   
         $this->init($data, $request);
     }

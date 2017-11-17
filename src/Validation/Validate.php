@@ -136,15 +136,11 @@ final class Validate {
                 continue;
             }
             
-            if ($this->numeric($field, $args, $msg)) {
-                continue;
-            }
-        
-            if ($this->minlength($field, $args, $msg)) {
+            if ($this->numericRules($field, $args, $msg)) {
                 continue;
             }
             
-            if ($this->maxlength($field, $args, $msg)) {
+            if ($this->mutableRules($field, $args, $msg)) {
                 continue;
             }
         }
@@ -170,6 +166,54 @@ final class Validate {
         }
         
         return $args;
+    }
+    
+    /**
+     * Execute numeric rules
+     * @param type $field
+     * @param type $args
+     * @param type $msg
+     * @return boolean
+     */
+    private function numericRules($field, $args, $msg) {
+        
+        if ($this->numeric($field, $args, $msg)) {
+            return true;
+        }
+
+        if ($this->minlength($field, $args, $msg)) {
+            return true;
+        }
+
+        if ($this->maxlength($field, $args, $msg)) {
+            return true;
+        }
+        
+        return false;
+    }
+    
+    /**
+     * Execute field mutable rules
+     * @param type $field
+     * @param type $args
+     * @param type $msg
+     * @return boolean
+     */
+    private function mutableRules($field, $args, $msg) {
+        
+        if ($this->defaultIfNull($field, $args, $msg)) {
+            return true;
+        }
+        
+        if ($this->cast($field, $args, $msg)) {
+            return true;
+        }
+
+        if ($this->callback($field, $args, $msg)) {
+            return true;
+        }
+        
+        return false;
     }
     
     /**
@@ -276,6 +320,95 @@ final class Validate {
                 $this->appendError($field, $args[0], $msg);
             }
             
+            return true;
+        }
+        
+        return false;
+    }
+    
+    /**
+     * Set a value if the field is null or different from the default value
+     * @param type $field
+     * @param type $args
+     * @param type $msg
+     * @return boolean
+     */
+    private function defaultIfNull($field, $args, $msg) {
+        
+        if ($args[0] === 'default') {
+            
+            if ($args[1] !== null) {
+                
+                if (($this->request->has($field) && $this->request->$field !== $args[1]) || 
+                        !$this->request->has($field)){
+                
+                    $this->request->$field = $msg;
+                }
+            }
+            else {
+                
+                $this->request->$field = $msg;
+            }
+
+            return true;
+        }
+        
+        return false;
+    }
+    
+    /**
+     * Cast the field value to the given type
+     * @param type $field
+     * @param type $args
+     * @param type $msg
+     * @return boolean
+     */
+    private function cast($field, $args, $msg) {
+        
+        if ($args[0] === 'cast') {
+            
+            $types = ['bool', 'int', 'double', 'object', 'string', 'array'];
+                
+            if ($this->request->has($field) && in_array($msg, $types)) {
+
+                $value = $this->request->$field;
+                
+                settype($this->request->$field, $msg);
+                
+                $this->request->$field = $value;
+            }
+
+            return true;
+        }
+        
+        return false;
+    }
+    
+    /**
+     * Executes a callback function in the field
+     * @param type $field
+     * @param type $args
+     * @param type $msg
+     * @return boolean
+     */
+    private function callback($field, $args, $msg) {
+        
+        if ($args[0] === 'callback') {
+                
+            if ($this->request->has($field) && function_exists($msg)) {
+                
+                // The function has a return value
+                if ($args[1] === null) {
+                    
+                    $this->request->$field = $msg($this->request->$field);
+                }
+                // The function mutates the variable by reference
+                else if ($args[1] === "true") {
+                    
+                    $msg($this->request->$field);
+                }
+            }
+
             return true;
         }
         
