@@ -57,6 +57,11 @@ final class RouteParser {
             $actionIndex = 1;
             $this->routeIsAdmin = true;
             $this->routeRequireLogin = true;
+            
+            if ($this->method === "post" || $this->method === "delete") {
+                
+                $this->routeRequireCsrf = true;
+            }
         }
         else {
 
@@ -243,6 +248,7 @@ final class RouteParser {
     private function setCsrfOptions($options) {
         
         $csrfOptions = null;
+        $this->routeRequireCsrf = false;
         
         if (isset($options['csrf'])) {
             

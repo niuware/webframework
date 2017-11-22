@@ -280,6 +280,7 @@ class Router {
             $this->routeAction = "login";
             $this->routeControllerPath = "login";
             $this->routeRequireLogin = false;
+            $this->routeRequireCsrf = false;
             
         } else {
             
