@@ -26,6 +26,8 @@ final class Application {
 
     private $language = [];
     
+    private $hasRendered = false;
+    
     /**
      * Returns the singleton for the class
      */
@@ -181,6 +183,8 @@ final class Application {
                 
                 $redirectTo = $reflectionMethod->invoke($this->controller, $this->router->getControllerParams());
                 
+                $this->hasRendered = true;
+                
                 $this->router->redirect($redirectTo);
             }
             catch (\ReflectionException $exception) {
@@ -252,7 +256,7 @@ final class Application {
             $exception->setFile($error['file']);
             $exception->setTrace($trace);
 
-            $exception->renderAll();
+            $exception->renderAll((!$this->hasRendered));
         }
     }
 }

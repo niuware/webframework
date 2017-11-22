@@ -56,13 +56,16 @@ final class FrameworkException extends \Exception {
     /**
      * Renders the exception queue
      */
-    public function renderAll() {
+    public function renderAll($useHeader = true) {
         
         $html = $this->getHeader();
         $html.= $this->getAll();
         $html.= $this->getFooter();
         
-        header('HTTP/1.0 500 Internal Server Error');
+        if ($useHeader) {
+            
+            header('HTTP/1.0 500 Internal Server Error');
+        }
         
         echo $html;
     }
