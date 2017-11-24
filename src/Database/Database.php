@@ -11,7 +11,6 @@ namespace Niuware\WebFramework\Database;
 
 use App\Config\Settings;
 use Illuminate\Database\Capsule\Manager as Capsule;
-use Illuminate\Database\Query\Builder;
     
 /**
 * Creates a connection to a database using Capsule (Eloquent)
@@ -24,7 +23,7 @@ final class Database {
      * Connects with the database registered in the settings file
      * @return type
      */
-    static function boot() {
+    public static function boot() {
 
         if (self::$isLoaded == true) {
             
@@ -35,18 +34,8 @@ final class Database {
         try {
 
             $capsule = new Capsule;
-
-            $capsule->addConnection([
-                'driver' => Settings::$databases['default']['engine'],
-                'host' => Settings::$databases['default']['host'],
-                'port' => Settings::$databases['default']['port'],
-                'database' => Settings::$databases['default']['schema'],
-                'prefix' => Settings::$databases['default']['prefix'],
-                'username' => Settings::$databases['default']['user'],
-                'password' => Settings::$databases['default']['pass'],
-                'charset' => Settings::$databases['default']['charset'],
-                'collation' => Settings::$databases['default']['collation']
-            ]);
+            
+            self::addConnections($capsule);
 
             $capsule->bootEloquent();
             
@@ -63,10 +52,35 @@ final class Database {
     /**
      * Returns an Eloquent Builder instance 
      * @param type $tableName Table name from which the instance will be generated
-     * @return type
+     * @param string $connection Name of the connection to use
+     * @return \Illuminate\Database\Query\Builder
      */
-    static function table($tableName) {
+    public static function table($tableName, $connection = null) {
         
-        return Capsule::table($tableName);
+        return Capsule::table($tableName, $connection);
+    }
+    
+    /**
+     * Adds all available connections to the Capsule Manager object
+     * @param type $capsule
+     */
+    private static function addConnections($capsule) {
+        
+        $databases = Settings::$databases;
+        
+        foreach ($databases as $name => $database) {
+            
+            $capsule->addConnection([
+                'driver' => $database['engine'],
+                'host' => $database['host'],
+                'port' => $database['port'],
+                'database' => $database['schema'],
+                'prefix' => $database['prefix'],
+                'username' => $database['user'],
+                'password' => $database['pass'],
+                'charset' => $database['charset'],
+                'collation' => $database['collation']
+            ], $name);
+        }
     }
 }
