@@ -83,10 +83,10 @@ final class Extension extends \Twig_Extension {
                             if ($urlAction[1] === $localPath[1]) {
 
                                 $exists = true;
+                                
+                                break;
                             }
                         }
-
-                        break;
                     }
                 }
                 
