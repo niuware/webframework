@@ -153,8 +153,10 @@ final class File {
      * Moves a file to the destination path
      * @param string $fileName
      * @param string $path
+     * @param bool $mimeTypeSuffix
+     * @param bool $overwrite
      */
-    public function save($fileName = '', $path = 'public', $mimeTypeSuffix = true) {
+    public function save($fileName = '', $path = 'public', $mimeTypeSuffix = true, $overwrite = false) {
         
         if (empty($this->original_request['tmp_name'])) {
             
@@ -182,7 +184,7 @@ final class File {
         
         $filePath = $uploadPath . $finalFileName;
         
-        if (file_exists($filePath)) {
+        if (file_exists($filePath) && $overwrite === false) {
             
             $finalFileName = $realFileName . '_' . date('YmdHmss') . '.' . $realFileExtension;
             
