@@ -57,11 +57,20 @@ final class Paginate {
 
         $hasQuery = false;
 
-        if (substr($url, -2) != '/?') {
+        if (substr($url, -2) !== "/?") {
+            
+            $lastChar = substr($url, -1);
 
-            if (substr($url, -1) != '/') {
+            if ($lastChar !== '/') {
 
-                $url.= '/';
+                if ($lastChar === '?') {
+                    
+                    $url = substr($url, 0, -1) . "/?";
+                }
+                else {
+                    
+                    $url.= '/';
+                }
             }
         }
         else {
