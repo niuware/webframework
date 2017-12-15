@@ -1,32 +1,36 @@
-<?php
-
+<?php 
 /**
-* This class is part of the core of Niuware WebFramework 
-* and is not particularly intended to be modified.
-* For information about the license please visit the 
-* GIT repository at:
-* https://github.com/niuware/web-framework
-*/
+ * 
+ * This class is part of the core of Niuware WebFramework 
+ * and it is not particularly intended to be modified.
+ * For information about the license please visit the 
+ * GIT repository at:
+ * 
+ * https://github.com/niuware/web-framework
+ */
+
 namespace Niuware\WebFramework\Application;
 
 use Niuware\WebFramework\Auth\Security;
 
+// Verify if Twig is available
 if (!class_exists('\Twig_Extension')) {
     
     die("ERROR: Add twig to your composer.json file and run composer to use the Extension core class.");
 }
 
 /**
- * Add custom functions/filters for use in twig templates
+ * Adds custom functions and filters to twig templates
  */
-final class Extension extends \Twig_Extension {
-    
+final class Extension extends \Twig_Extension
+{
     /**
-     * Load Twig functions
+     * Loads Twig functions
+     * 
      * @return array
      */
-    public function getFunctions() {
-        
+    public function getFunctions()
+    {
         if (class_exists('\App\Helpers\TwigFunctions')) {
         
             $reflectionClass = new \ReflectionClass('\App\Helpers\TwigFunctions');
@@ -105,11 +109,12 @@ final class Extension extends \Twig_Extension {
     }
     
     /**
-     * Load Twig filters
+     * Loads Twig filters
+     * 
      * @return array
      */
-    public function getFilters() {
-        
+    public function getFilters()
+    {
         if (class_exists('\App\Helpers\TwigFilters')) {
         
             $reflectionClass = new \ReflectionClass('\App\Helpers\TwigFilters');

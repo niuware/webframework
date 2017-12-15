@@ -1,31 +1,37 @@
 <?php 
-
 /**
-* This class is part of the core of Niuware WebFramework 
-* and is not particularly intended to be modified.
-* For information about the license please visit the 
-* GIT repository at:
-* https://github.com/niuware/web-framework
-*/
+ * 
+ * This class is part of the core of Niuware WebFramework 
+ * and it is not particularly intended to be modified.
+ * For information about the license please visit the 
+ * GIT repository at:
+ * 
+ * https://github.com/niuware/web-framework
+ */
+
 namespace Niuware\WebFramework\Application;
 
 /**
-* Defines static methods for autoloading 
-* App namespace classes independently
-*/
-class Autoloader {
-    
+ * Autoloads application classes 
+ */
+class Autoloader 
+{
+    /**
+     * The application space ('main', 'admin', etc.)
+     * 
+     * @var string 
+     */
     private static $subSpace;
 
     /**
-     * Loads the requested file if exists
-     * @param type $filename File to load
-     * @return boolean
+     * Loads the requested file
+     * 
+     * @param string $filename
+     * @return void|bool
      */
-    public static function load($filename) {
-        
-        if (!file_exists($filename))
-        {
+    public static function load($filename)
+    {
+        if (!file_exists($filename)) {
             return false;
         }
 
@@ -33,11 +39,13 @@ class Autoloader {
     }
 
     /**
-     * Registers the autoloading for core classes
-     * @param type $class Class or Interface to load
+     * Autoloads a class
+     * 
+     * @param string $class
+     * @return void
      */
-    public static function core($class) {
-        
+    public static function core($class)
+    {
         if (substr($class, 0, 20) !== "Niuware\WebFramework") {
             
             $namespacePath = explode("\\", $class);
@@ -63,20 +71,22 @@ class Autoloader {
     }
     
     /**
-     * Registers the autoloading for configuration classes
-     * @return string Path to the class
+     * Gets the autoload path for Configuration classes
+     * 
+     * @return string
      */
-    private static function config() {
-
+    private static function config()
+    {
         return 'App/Config/';
     }
 
     /**
-     * Registers the autoloading for API classes
-     * @return string Path to the class
+     * Gets the autoload path for Api classes
+     * 
+     * @return string
      */
-    private static function api() {
-
+    private static function api()
+    {
         $path = 'App/Api/';
         $subspace = str_replace('Api', '', self::$subSpace);
         
@@ -89,11 +99,12 @@ class Autoloader {
     }
 
     /**
-     * Registers the autoloading for controller classes
-     * @return string Path to the class
+     * Gets the autoload path for Controller classes
+     * 
+     * @return string
      */
-    private static function controllers() {
-
+    private static function controllers()
+    {
         $path = 'App/Controllers/';
         $subspace = str_replace('Controllers', '', self::$subSpace);
         
@@ -106,29 +117,31 @@ class Autoloader {
     }
 
     /**
-     * Registers the autoloading for model classes
+     * Gets the autoload path for Model classes
      * @return string Path to the class
      */
-    private static function models() {
-
+    private static function models()
+    {
         return 'App/Models/';
     }
     
     /**
-     * Registers the autoloading for helper classes
-     * @return string Path to the class
+     * Registers the autoloading for Helper classes
+     * 
+     * @return string
      */
-    private static function helpers() {
-        
+    private static function helpers()
+    {
         return 'App/Helpers/';
     }
     
     /**
-     * Registers the autoloading for request classes
-     * @return string Path to the class
+     * Gets the autoload path for Request classes
+     * 
+     * @return string
      */
-    private static function requests() {
-        
+    private static function requests()
+    {
         $path = 'App/Requests/';
         $subspace = str_replace('Requests', '', self::$subSpace);
         

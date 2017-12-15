@@ -1,30 +1,66 @@
 <?php 
-
 /**
-* This class is part of the core of Niuware WebFramework 
-* and is not particularly intended to be modified.
-* For information about the license please visit the 
-* GIT repository at:
-* https://github.com/niuware/web-framework
-*/
+ * 
+ * This class is part of the core of Niuware WebFramework 
+ * and it is not particularly intended to be modified.
+ * For information about the license please visit the 
+ * GIT repository at:
+ * 
+ * https://github.com/niuware/web-framework
+ */
+
 namespace Niuware\WebFramework\Application;
 
 use Niuware\WebFramework\Database\MigrationManager;
 
+/**
+ * Executes commands for the application Console mode
+ */
 final class Console {
     
+    /**
+     * The command to execute
+     * 
+     * @var string 
+     */
     private $command;
     
+    /**
+     * The command options
+     * 
+     * @var string 
+     */
     private $commandOption;
     
+    /**
+     * The command arguments
+     * 
+     * @var array 
+     */
     private $commandArgs;
     
+    /**
+     * The command result output
+     * 
+     * @var string 
+     */
     private $result;
     
+    /**
+     * The console mode (web, terminal, enabled, disabled)
+     * @var string 
+     */
     private $mode;
     
-    public function __construct($input, $mode = 'terminal') {
-        
+    /**
+     * Initializes the console
+     * 
+     * @param array $input
+     * @param string $mode
+     * @return void
+     */
+    public function __construct($input, $mode = 'terminal')
+    {
         register_shutdown_function(function() {
             
             $this->shutdown(error_get_last());
@@ -35,13 +71,24 @@ final class Console {
         $this->initialize($input);
     }
     
-    public function getResult() {
-        
+    /**
+     * Gets the command output
+     * 
+     * @return string
+     */
+    public function getResult()
+    {
         return $this->result;
     }
     
-    private function shutdown($error) {
-        
+    /**
+     * Renders a console error
+     * 
+     * @param array $error
+     * @return void
+     */
+    private function shutdown($error)
+    {
         if (isset($error['type']) && 
                 ($error['type'] === \E_ERROR || $error['type'] === \E_CORE_ERROR || 
                 $error['type'] === \E_COMPILE_ERROR || $error['type'] === \E_USER_ERROR)) {
@@ -71,8 +118,14 @@ final class Console {
         }
     }
     
-    private function initialize($input) {
-        
+    /**
+     * Initializes the command
+     * 
+     * @param array $input
+     * @return void
+     */
+    private function initialize($input)
+    {
         $this->command = (isset($input[1])) ? $input[1] : null;
         $this->commandOption = (isset($input[2])) ? $input[2] : null;
         
@@ -92,8 +145,14 @@ final class Console {
         }
     }
     
-    private function setCommandArgs($input) {
-        
+    /**
+     * Sets the command arguments
+     * 
+     * @param array $input
+     * @return void
+     */
+    private function setCommandArgs($input)
+    {
         $this->commandArgs = [];
         
         if (count($input) > 2) {
@@ -102,8 +161,13 @@ final class Console {
         }
     }
     
-    private function executeCommand() {
-                
+    /**
+     * Executes a command
+     * 
+     * @return void
+     */
+    private function executeCommand()
+    {
         switch ($this->command) {
             
             case 'migrations' :

@@ -1,12 +1,14 @@
 <?php 
-
 /**
-* This class is part of the core of Niuware WebFramework 
-* and is not particularly intended to be modified.
-* For information about the license please visit the 
-* GIT repository at:
-* https://github.com/niuware/web-framework
-*/
+ * 
+ * This class is part of the core of Niuware WebFramework 
+ * and it is not particularly intended to be modified.
+ * For information about the license please visit the 
+ * GIT repository at:
+ * 
+ * https://github.com/niuware/web-framework
+ */
+
 namespace Niuware\WebFramework\Http;
 
 use App\Config\Routes;
@@ -14,41 +16,104 @@ use App\Config\Routes;
 /**
  * Parses a route
  */
-final class RouteParser {
-    
+final class RouteParser
+{
+    /**
+     * The route path
+     * 
+     * @var array 
+     */
     private $path;
     
+    /**
+     * A flag to determine if the route requires an authentication
+     * 
+     * @var bool 
+     */
     private $routeRequireLogin = false;
     
+    /**
+     * A flag to determine if the route requires a valid CSRF token
+     * 
+     * @var bool 
+     */
     private $routeRequireCsrf = false;
     
+    /**
+     * A flag to determine if the route is in the Application Admin Space
+     * 
+     * @var bool 
+     */
     private $routeIsAdmin = false;
     
+    /**
+     * The route controller path
+     * 
+     * @var string 
+     */
     private $routeControllerPath;
     
+    /**
+     * The route controller name
+     * 
+     * @var string 
+     */
     private $routeController;
     
+    /**
+     * The route controller action
+     * 
+     * @var string 
+     */
     private $routeAction = "";
     
+    /**
+     * The route request class name
+     * 
+     * @var string 
+     */
     private $routeRequest = "";
     
+    /**
+     * The route mapped parameters
+     * 
+     * @var array 
+     */
     private $routeMappedParams = [];
     
+    /**
+     * The route Application Space
+     * 
+     * @var string 
+     */
     private $routeMode = "main";
     
+    /**
+     * The request method
+     * @var type 
+     */
     private $method = "";
     
-    function __construct($path, $method) {
-        
+    /**
+     * Initializes the default parser values
+     * 
+     * @param array $path
+     * @param string $method
+     * @return void
+     */
+    public function __construct($path, $method)
+    {
         $this->path = $path;
         $this->method = $method;
     }
     
     /**
-     * Parse the route parameters based on the current URL
+     * Parses the route parameters
+     * 
+     * @return void
      */
-    public function parse() {
-        
+    public function parse()
+    {
         $actionIndex = 0;
 
         if ($this->path[0] === 'admin') {
@@ -78,20 +143,23 @@ final class RouteParser {
     }
     
     /**
-     * Sets all route parameters
-     * @param type $routeRequireLogin
-     * @param type $routeRequireCsrf
-     * @param type $routeIsAdmin
-     * @param type $routeControllerPath
-     * @param type $routeController
-     * @param type $routeAction
-     * @param type $routeRequest
-     * @param type $routeMappedParams
-     * @param type $routeMode
+     * Sets all route attributes
+     * 
+     * @param bool $routeRequireLogin
+     * @param bool $routeRequireCsrf
+     * @param bool $routeIsAdmin
+     * @param string $routeControllerPath
+     * @param string $routeController
+     * @param string $routeAction
+     * @param string $routeRequest
+     * @param string $routeMappedParams
+     * @param string $routeMode
+     * @return void
      */
     public function setRouteDefinition(&$routeRequireLogin, &$routeRequireCsrf, &$routeIsAdmin,
             &$routeControllerPath, &$routeController, &$routeAction, &$routeRequest, 
-            &$routeMappedParams, &$routeMode) {
+            &$routeMappedParams, &$routeMode)
+    {
         
         $routeRequireLogin = $this->routeRequireLogin;
         $routeRequireCsrf = $this->routeRequireCsrf;
@@ -109,12 +177,13 @@ final class RouteParser {
     }
     
     /**
-     * Get all matching controller routes
-     * @param type $actionIndex
-     * @return type
+     * Gets all matching controller routes
+     * 
+     * @param int $actionIndex
+     * @return array
      */
-    private function getMatchingRoutes($actionIndex) {
-        
+    private function getMatchingRoutes($actionIndex)
+    {
         $matchingRoutes = [];
 
         foreach (Routes::$views[$this->routeMode] as $route => $controller) {
@@ -136,12 +205,14 @@ final class RouteParser {
     }
     
     /**
-     * Sets controller and route parameters for the current route
-     * @param type $matchingRoutes
-     * @param type $actionIndex
+     * Sets the controller and route parameters for the current route
+     * 
+     * @param array $matchingRoutes
+     * @param int $actionIndex
+     * @return void
      */
-    private function setRouteParameters($matchingRoutes, $actionIndex) {
-        
+    private function setRouteParameters($matchingRoutes, $actionIndex)
+    {
         $tmpPath = $this->path;
         $matchingPath = implode('/', array_splice($tmpPath, $actionIndex));
         
@@ -169,12 +240,15 @@ final class RouteParser {
     }
     
     /**
-     * Sets the controller loading name and path
-     * @param type $controller
-     * @param type $controllerPath
+     * Sets the controller name and path
+     * 
+     * @param array $controller
+     * @param string $controllerPath
+     * @param string $customAction
+     * @return void
      */
-    private function setController($controller, $controllerPath, &$customAction) {
-        
+    private function setController($controller, $controllerPath, &$customAction)
+    {
         if (isset($controller['use'])) {
             
             $customController = explode('@', $controller['use']);
@@ -197,11 +271,13 @@ final class RouteParser {
     }
     
     /**
-     * Sets the controller require attributes if any
-     * @param type $controller
+     * Sets the controller required attributes
+     * 
+     * @param array $controller
+     * @return void
      */
-    private function setControllerRequirements($controller) {
-        
+    private function setControllerRequirements($controller)
+    {
         if (isset($controller['require']) && is_array($controller['require'])) {
 
             if (in_array('login', $controller['require']) || 
@@ -220,10 +296,12 @@ final class RouteParser {
     
     /**
      * Sets the login options for the route
-     * @param type $options
+     * 
+     * @param array $options
+     * @return void
      */
-    private function setLoginOptions($options) {
-        
+    private function setLoginOptions($options)
+    {
         $loginOptions = null;
         
         if (isset($options['login'])) {
@@ -243,10 +321,12 @@ final class RouteParser {
     
     /**
      * Sets the CSRF validation options for the route
-     * @param type $options
+     * 
+     * @param array $options
+     * @return void
      */
-    private function setCsrfOptions($options) {
-        
+    private function setCsrfOptions($options)
+    {
         $csrfOptions = null;
         $this->routeRequireCsrf = false;
         
@@ -280,11 +360,13 @@ final class RouteParser {
     }
     
     /**
-     * Sets the custom controller Request class if any
-     * @param type $controller
+     * Sets the custom Request class
+     * 
+     * @param array $controller
+     * @return void
      */
-    private function setControllerRequest($controller) {
-        
+    private function setControllerRequest($controller)
+    {
         if (isset($controller['request'])) {
             
             $this->routeRequest = $controller['request'];
@@ -292,12 +374,15 @@ final class RouteParser {
     }
     
     /**
-     * Sets the controller's action to load
-     * @param type $path
-     * @param type $actionIndex
+     * Sets the controller's method to execute
+     * 
+     * @param array $path
+     * @param int $actionIndex
+     * @param string $customAction
+     * @return void
      */
-    private function setRouteAction($path, $actionIndex, $customAction) {
-        
+    private function setRouteAction($path, $actionIndex, $customAction)
+    {
         if (isset($this->path[$actionIndex + 1]) && isset($path[1])) {
 
             if ($this->path[$actionIndex + 1] === $path[1]) {
@@ -313,12 +398,14 @@ final class RouteParser {
     }
     
     /**
-     * Maps the route parameters if any
-     * @param type $route
-     * @param type $matchingPath
+     * Maps the route parameters
+     * 
+     * @param string $route
+     * @param string $matchingPath
+     * @return void
      */
-    private function setMappedParameters($route, $matchingPath) {
-        
+    private function setMappedParameters($route, $matchingPath)
+    {
         $matches = [];
         
         if (preg_match('/\{(.*?)\}/', $route, $matches, PREG_OFFSET_CAPTURE) > 0) {

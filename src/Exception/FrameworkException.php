@@ -1,63 +1,92 @@
-<?php
-
+<?php 
 /**
-* This class is part of the core of Niuware WebFramework 
-* and is not particularly intended to be modified.
-* For information about the license please visit the 
-* GIT repository at:
-* https://github.com/niuware/web-framework
-*/
+ * 
+ * This class is part of the core of Niuware WebFramework 
+ * and it is not particularly intended to be modified.
+ * For information about the license please visit the 
+ * GIT repository at:
+ * 
+ * https://github.com/niuware/web-framework
+ */
+
 namespace Niuware\WebFramework\Exception;
 
 /**
-* Base framework exception class
-*/
-final class FrameworkException extends \Exception {
+ * Default framework exception class
+ */
+final class FrameworkException extends \Exception
+{
+    /**
+     * A custom trace for the exception
+     * 
+     * @var string
+     */
+    private $customTrace;
     
-    private $customTrace = null;
-    
-    public function __construct($message, $code = 0, \Throwable $previous = null) {
-        
+    /**
+     * Initializes an exception
+     * 
+     * @param string $message
+     * @param int $code
+     * @param \Throwable $previous
+     * @return void
+     */
+    public function __construct($message, $code = 0, \Throwable $previous = null)
+    {
         parent::__construct($message, $code, $previous);
     }
     
-    public function __toString() {
-        
+    /**
+     * Gets the string representation of the exception
+     * 
+     * @return string
+     */
+    public function __toString()
+    {
         return "WebFramework Exception: {$this->message}\n";
     }
     
     /**
-     * Sets the line where the exception was thrown
-     * @param type $line
+     * Sets the line number in which the exception was thrown
+     * 
+     * @param string $line
+     * @return void
      */
-    public function setLine($line) {
-        
+    public function setLine($line)
+    {
         $this->line = $line;
     }
     
     /**
-     * Sets the file where the exception was thrown
-     * @param type $file
+     * Sets the file name where the exception was thrown
+     * 
+     * @param string $file
+     * @return void
      */
-    public function setFile($file) {
-        
+    public function setFile($file)
+    {
         $this->file = $file;
     }
     
     /**
-     * Sets a custom trace
-     * @param type $trace
+     * Sets the custom trace
+     * 
+     * @param string $trace
+     * @return void
      */
-    public function setTrace($trace) {
-        
+    public function setTrace($trace)
+    {
         $this->customTrace = $trace;
     }
     
     /**
-     * Renders the exception queue
+     * Renders the exception
+     * 
+     * @param bool $useHeader
+     * @return void
      */
-    public function renderAll($useHeader = true) {
-        
+    public function renderAll($useHeader = true)
+    {
         $html = $this->getHeader();
         $html.= $this->getAll();
         $html.= $this->getFooter();
@@ -71,11 +100,12 @@ final class FrameworkException extends \Exception {
     }
     
     /**
-     * Gets the HTML string detail for all exceptions in queue
+     * Gets the exception HTML body
+     * 
      * @return string
      */
-    private function getAll() {
-        
+    private function getAll()
+    {
         $count = 2;
         $body = $this->getBody($this, 1);      
         
@@ -92,11 +122,12 @@ final class FrameworkException extends \Exception {
     }
     
     /**
-     * Gets the HTML header 
+     * Gets the exception HTML header
+     * 
      * @return string
      */
-    private function getHeader() {
-        
+    private function getHeader()
+    {
         $template = 
 <<<EOD
 <!DOCTYPE html>
@@ -111,24 +142,26 @@ EOD;
     }
     
     /**
-     * Gets the HTML footer
+     * Gets the exception HTML footer
+     * 
      * @return string
      */
-    private function getFooter() {
-        
+    private function getFooter()
+    {
         $template = '</body></html>';
         
         return $template;
     }
     
     /**
-     * Gets the body for the exception
+     * Gets the body for an exception
+     * 
      * @param \Exception $exception
      * @param integer $count
      * @return string
      */
-    private function getBody(\Exception $exception, $count) {
-        
+    private function getBody(\Exception $exception, $count)
+    {
         $template = 
 <<<EOD
     <div style="width:75%;border:1px solid #cccccc;background-color:#ffffff;margin:20px auto;border-radius:5px 5px;">

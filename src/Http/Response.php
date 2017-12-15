@@ -1,33 +1,57 @@
-<?php
-
+<?php 
 /**
-* This class is part of the core of Niuware WebFramework 
-* and is not particularly intended to be modified.
-* For information about the license please visit the 
-* GIT repository at:
-* https://github.com/niuware/web-framework
-*/
+ * 
+ * This class is part of the core of Niuware WebFramework 
+ * and it is not particularly intended to be modified.
+ * For information about the license please visit the 
+ * GIT repository at:
+ * 
+ * https://github.com/niuware/web-framework
+ */
+
 namespace Niuware\WebFramework\Http;
 
 /**
- * Base class for a response
+ * Base class for a controller response
  */
-final class Response {
-    
+final class Response
+{
+    /**
+     * The response data
+     * 
+     * @var array 
+     */
     private $data = [];
 
+    /**
+     * A flag to determine the occurrence of an error
+     * 
+     * @var bool 
+     */
     private $error = false;
     
-    public function __construct($defaultValues = []) {
-       
+    /**
+     * The default response values
+     * 
+     * @param array $defaultValues
+     * @return void
+     */
+    public function __construct($defaultValues = [])
+    {
         if (!empty($defaultValues)) {
             
             $this->add($defaultValues, false, true);
         }
     }
     
-    public function __get($name) {
-            
+    /**
+     * Gets a value from the response
+     * 
+     * @param string $name
+     * @return mixed
+     */
+    public function __get($name)
+    {
         if ($name !== 'error') {
             
             return $this->data[$name];
@@ -38,8 +62,15 @@ final class Response {
         }
     }
     
-    public function __set($name, $value) {
-        
+    /**
+     * Sets a response value
+     * 
+     * @param string $name
+     * @param mixed $value
+     * @return void
+     */
+    public function __set($name, $value)
+    {
         if ($name !== 'error') {
             
             $this->data[$name] = $value;
@@ -51,29 +82,35 @@ final class Response {
     }
     
     /**
-    * Gets the data
-    * @return mixed  
-    */
+     * Gets the response data
+     * 
+     * @return mixed
+     */
     public function data() {
         
         return $this->data;
     }
     
     /**
-     * Returns the current error status
+     * Returns the error status
+     * 
      * @return mixed
      */
-    public function error() {
-        
+    public function error()
+    {
         return $this->error;
     }
     
     /**
      * Adds multiple values at once
+     * 
      * @param array $data
+     * @param bool $clear
+     * @param bool $overwriteError
+     * @return void
      */
-    public function add(array $data, $clear = false, $overwriteError = false) {
-        
+    public function add(array $data, $clear = false, $overwriteError = false)
+    {
         // Prevent error overwrite
         $saveError = $this->error;
         
@@ -95,10 +132,12 @@ final class Response {
     
     /**
      * Removes multiple keys from the data array
+     * 
      * @param array $keys
+     * @return void
      */
-    public function remove(array $keys) {
-        
+    public function remove(array $keys)
+    {
         // Prevent error overwrite
         $saveError = $this->error;
         
@@ -114,19 +153,22 @@ final class Response {
     }
     
     /**
-     * Clears the data array
+     * Clears the response data
+     * 
+     * @return void
      */
-    public function clear() {
-        
+    public function clear()
+    {
         $this->data = [];
     }
     
     /**
      * Returns the response array (data and error)
+     * 
      * @return array
      */
-    public function output() {
-        
+    public function output()
+    {
         $response = [
 
             'data' => $this->data(),
@@ -137,11 +179,12 @@ final class Response {
     }
     
     /**
-     * Renders the output response as a 
-     * JSON string
+     * Renders the output response as a JSON string
+     * 
+     * @return void
      */
-    public function render($options = 0, $depth = 512) {
-        
+    public function render($options = 0, $depth = 512)
+    {
         echo json_encode($this->output(), $options, $depth);
     }
 }

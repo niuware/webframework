@@ -1,45 +1,68 @@
 <?php 
-
 /**
-* This class is part of the core of Niuware WebFramework 
-* and is not particularly intended to be modified.
-* For information about the license please visit the 
-* GIT repository at:
-* https://github.com/niuware/web-framework
-*/
+ * 
+ * This class is part of the core of Niuware WebFramework 
+ * and it is not particularly intended to be modified.
+ * For information about the license please visit the 
+ * GIT repository at:
+ * 
+ * https://github.com/niuware/web-framework
+ */
+
 namespace Niuware\WebFramework\Application;
 
 /**
-* Base class for all Controller classes
-*/
+ * Base class for an application Controller class
+ */
 abstract class Controller {
 
+    /**
+     * A flag to set if the controller requires an authentication
+     * 
+     * @var bool 
+     */
     private $authenticate;
     
+    /**
+     * A flag to set if the controller is in the Admin Application Space
+     * 
+     * @var bool 
+     */
     private $isAdmin;
     
+    /**
+     * The controller renderer ('php' or 'twig')
+     * 
+     * @var string 
+     */
     private $renderer;
     
+    /**
+     * The controller attributes
+     * @var array 
+     */
     private $attributes = [];
 
     /**
-    * Set default values for the controller
-    */
-    function __construct() { 
-        
+     * Sets the default values for the controller
+     * 
+     * @return void
+     */
+    public function __construct()
+    {
         $this->renderer = \App\Config\DEFAULT_RENDERER;
-
         $this->authenticate = false;
         $this->isAdmin = false;
     }
 
     /**
-     * Gets a controller property
-     * @param type $name
-     * @return type
+     * Gets a controller attribute
+     * 
+     * @param string $name
+     * @return mixed|null
      */
-    public function __get($name) {
-
+    public function __get($name)
+    {
         if (isset($this->attributes[$name])) {
             
             return $this->attributes[$name];
@@ -49,21 +72,25 @@ abstract class Controller {
     }
 
     /**
-     * Sets a property to the controller
-     * @param type $name
-     * @param type $value
+     * Sets a controller attribute
+     * 
+     * @param string $name
+     * @param mixed $value
+     * @return void
      */
-    public function __set($name, $value) {
-
+    public function __set($name, $value)
+    {
         $this->attributes[$name] = $value;
     }
     
     /**
-     * Sets the renderer to use for the controller
-     * @param string $renderer Should be either 'php' or 'twig'
+     * Sets the renderer for the controller
+     * 
+     * @param string $renderer
+     * @return void
      */
-    public function setRenderer($renderer = 'twig') {
-        
+    public function setRenderer($renderer = 'twig')
+    {
         if ($renderer === 'twig' || $renderer === 'php') {
             
             $this->renderer = $renderer;
@@ -72,18 +99,24 @@ abstract class Controller {
     
     /**
      * Gets the renderer for the controller
-     * @return string Either 'php' or 'twig'
+     * 
+     * @return string
      */
-    public function getRenderer() {
-        
+    public function getRenderer()
+    {
         return $this->renderer;
     }
 
     /**
      * Renders the view for the controller
+     * 
+     * @param string $path
+     * @return string|null
+     * 
+     * @throws \Niuware\WebFramework\Exception\FrameworkException
      */
-    public function render($path = '') {
-        
+    public function render($path = '')
+    {
         if ($path !== '') {
             
             return $path;
@@ -111,10 +144,12 @@ abstract class Controller {
     }
     
     /**
-     * Renders the controller view using Twig Template Engine
+     * Renders the controller view
+     * 
+     * @return void
      */
-    private function renderWithTwig() {
-        
+    private function renderWithTwig()
+    {
         $twigLoader = new \Twig_Loader_Filesystem('./public/views');
         
         $rendererSettings['cache'] = './App/cache';

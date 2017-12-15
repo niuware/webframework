@@ -1,12 +1,14 @@
 <?php 
-
 /**
-* This class is part of the core of Niuware WebFramework 
-* and is not particularly intended to be modified.
-* For information about the license please visit the 
-* GIT repository at:
-* https://github.com/niuware/web-framework
-*/
+ * 
+ * This class is part of the core of Niuware WebFramework 
+ * and it is not particularly intended to be modified.
+ * For information about the license please visit the 
+ * GIT repository at:
+ * 
+ * https://github.com/niuware/web-framework
+ */
+
 namespace Niuware\WebFramework\Application;
 
 use Niuware\WebFramework\Auth\Auth;
@@ -15,24 +17,46 @@ use Niuware\WebFramework\Database\Database;
 use Niuware\WebFramework\Exception\FrameworkException;
     
 /**
-* Executes the application processing the correct routing
-* and loading/rendering the called controller 
-*/
-final class Application {
-
+ * Executes the application and renders the output for the current
+ * router instance
+ */
+final class Application 
+{
+    /**
+     * The Router instance
+     * 
+     * @var \Niuware\WebFramework\Http\Router
+     */
     private $router;
 
-    private $controller = null;
+    /**
+     * The Controller instance
+     * 
+     * @var \Niuware\WebFramework\Application\Controller 
+     */
+    private $controller;
 
+    /**
+     * The language definition
+     * 
+     * @var array 
+     */
     private $language = [];
     
+    /**
+     * A flag to set if the route has rendered an output
+     * 
+     * @var bool 
+     */
     private $hasRendered = false;
     
     /**
-     * Returns the singleton for the class
+     * Returns the singleton instance for this class
+     * 
+     * @return $this
      */
-    public static function getInstance() {
-        
+    public static function getInstance()
+    {
         static $instance = null;
         
         if ($instance === null) {
@@ -44,19 +68,24 @@ final class Application {
     }
 
     /**
-     * Initializes the application
+     * Initializes the framework autoloader
+     * 
+     * @return void
      */
-    private function __construct() {
+    private function __construct()
+    {
         
         spl_autoload_register(null, false);
         spl_autoload_register(__NAMESPACE__ . "\Autoloader::core");
     }
 
     /**
-    * Calls all necessary methods to execute the application
-    */
-    public function run() {
-        
+     * Executes the application
+     * 
+     * @return void
+     */
+    public function run()
+    {
         Auth::start();
 
         $this->setLanguage();
@@ -79,10 +108,12 @@ final class Application {
     }
     
     /**
-    * Initialize the console mode
-    */
-    public function console() {
-        
+     * Initializes the application console mode
+     * 
+     * @return void
+     */
+    public function console()
+    {
         $this->setLanguage();
         
         if (\App\Config\CONSOLE_MODE === 'terminal' || \App\Config\CONSOLE_MODE === 'enabled') {
@@ -103,11 +134,15 @@ final class Application {
             exit;
         }
     }
-
+    
     /**
-    * Sets the language defined in the application settings file
-    */
-    private function setLanguage($lang = 'default') {
+     * Sets the language definition found in the \App\Config\Settings class
+     * 
+     * @param string $lang
+     * @return void
+     */
+    private function setLanguage($lang = 'default')
+    {
 
         $this->language = \App\Config\Settings::$languages[$lang];
 
@@ -116,11 +151,13 @@ final class Application {
     }
     
     /**
-     * Calls the method associated with the Uri query string if exists,
-     * if not, calls the default method
+     * Calls the method associated with the URL query string if exists,
+     * if not, the default method is called
+     * 
+     * @return void
      */
-    private function loadController() {
-        
+    private function loadController()
+    {
         $baseMethodName = str_replace(['-', '_'], '', $this->router->getControllerAction());
         
         $methodPrefix = $this->router->getRequestMethod();
@@ -148,11 +185,14 @@ final class Application {
     }
     
     /**
-     * Throws the method not found FrameworkException
-     * @throws FrameworkException
+     * Sets the correct description for a "Method not found" FrameworkException
+     * 
+     * @return void
+     * 
+     * @throws \Niuware\WebFramework\Exception\FrameworkException
      */
-    private function methodNotFound() {
-        
+    private function methodNotFound()
+    {
         $rootMethodName = str_replace(['get', 'post'], '', $this->router->getControllerAction());
         $reason = "";
 
@@ -169,12 +209,15 @@ final class Application {
     }
     
     /**
-     * Executes the method on the controller
-     * @param type $methodName
-     * @throws FrameworkException
+     * Executes a method found in the loaded controller
+     * 
+     * @param string $methodName
+     * @return void
+     * 
+     * @throws \Niuware\WebFramework\Exception\FrameworkException
      */
-    private function executeController($methodName) {
-        
+    private function executeController($methodName)
+    {
         $reflectionMethod = new \ReflectionMethod($this->controller, $methodName);
         
         if ($reflectionMethod->isPublic()) {
@@ -205,14 +248,16 @@ final class Application {
             throw new FrameworkException("No callable method with the name '$methodName' was found.", 105);
         }
     }
-
+    
     /**
-    * Loads all necessary classes to load the called controller
-    * This method is only called if the server request is  
-    * NOT an API call
-    */
-    private function start() {
-
+     * Prepares the application for loading a controller
+     * 
+     * @return void
+     * 
+     * @throws \Niuware\WebFramework\Exception\FrameworkException
+     */
+    private function start()
+    {
         Database::boot();
 
         try {
@@ -230,11 +275,14 @@ final class Application {
     }
     
     /**
-     * Renders the shutdown exception if any
-     * @param type $error
+     * Renders the shutdown exception
+     * 
+     * @param array $error
+     * 
+     * @return void
      */
-    private function shutdown($error) {
-        
+    private function shutdown($error)
+    {
         if ($error !== null && is_array($error)) {
             
             $trace = null;

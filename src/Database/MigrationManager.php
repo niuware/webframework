@@ -1,12 +1,14 @@
 <?php 
-
 /**
-* This class is part of the core of Niuware WebFramework 
-* and is not particularly intended to be modified.
-* For information about the license please visit the 
-* GIT repository at:
-* https://github.com/niuware/web-framework
-*/
+ * 
+ * This class is part of the core of Niuware WebFramework 
+ * and it is not particularly intended to be modified.
+ * For information about the license please visit the 
+ * GIT repository at:
+ * 
+ * https://github.com/niuware/web-framework
+ */
+
 namespace Niuware\WebFramework\Database;
 
 use Niuware\WebFramework\Auth\Security;
@@ -25,20 +27,46 @@ use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\StreamOutput;
 
 /**
- * Executes migration commands
+ * Executes a migration
  */
-final class MigrationManager {
-    
+final class MigrationManager
+{
+    /**
+     * The migration command
+     * 
+     * @var string 
+     */
     private $command;
     
+    /**
+     * The command arguments
+     * 
+     * @var array 
+     */
     private $commandArgs;
     
+    /**
+     * The command result output
+     * 
+     * @var string 
+     */
     private $result;
     
+    /**
+     * All available commands
+     * @var array 
+     */
     private $availableCommands = ['create', 'migrate', 'rollback', 'status', 'seedcreate', 'seedrun'];
     
-    public function __construct($command, $args = []) {
-        
+    /**
+     * Initializes the migration
+     * 
+     * @param string $command
+     * @param array $args
+     * @return void
+     */
+    public function __construct($command, $args = [])
+    {
         $this->command = $command;
         $this->commandArgs = $args;
         
@@ -46,20 +74,22 @@ final class MigrationManager {
     }
     
     /**
-     * Return command execution result
+     * Gets the command output
+     * 
      * @return string
      */
-    public function getResult() {
-        
+    public function getResult()
+    {
         return $this->result;
     }
     
     /**
-     * Calls the command to execute
-     * @return null
+     * Initializes the command
+     * 
+     * @return void
      */
-    private function initialize() {
-        
+    private function initialize()
+    {
         if (in_array($this->command, $this->availableCommands)) {
         
             $phinxApp = new PhinxApplication();
@@ -82,10 +112,11 @@ final class MigrationManager {
     
     /**
      * Sets the configuration for the migration adapter
+     * 
      * @return array
      */
-    private function getConfig() {
-        
+    private function getConfig()
+    {
         return [
             'paths' => [
                 'migrations' => 'App/Migrations/Migrations',
@@ -110,12 +141,14 @@ final class MigrationManager {
     }
     
     /**
-     * Sets the command arguments if exist
+     * Sets the command arguments
+     * 
      * @param array $command
      * @param string $argumentShort
+     * @return void
      */
-    private function setCommandArguments(&$command, $argumentShort = '-t') {
-        
+    private function setCommandArguments(&$command, $argumentShort = '-t')
+    {
         if (count($this->commandArgs) > 2) {
             
             if ($this->commandArgs[1] === $argumentShort && 
@@ -127,13 +160,15 @@ final class MigrationManager {
     }
     
     /**
-     * Creates a migration definition class
-     * @param PhinxApplication $app
-     * @param Config $config
-     * @param Stream $stream
+     * Creates a migration definition file
+     * 
+     * @param Phinx\Console\PhinxApplication $app
+     * @param Phinx\Config\Config $config
+     * @param resource $stream
+     * @return void
      */
-    private function create(PhinxApplication $app, Config $config, $stream) {
-        
+    private function create(PhinxApplication $app, Config $config, $stream)
+    {
         $command = [
             'command' => 'create',
             'name' => 'V' . time(),
@@ -152,13 +187,15 @@ final class MigrationManager {
     }
     
     /**
-     * Executes the migration
-     * @param PhinxApplication $app
-     * @param Config $config
-     * @param Stream $stream
+     * Runs a migration
+     * 
+     * @param Phinx\Console\PhinxApplication $app
+     * @param Phinx\Config\Config $config
+     * @param resource $stream
+     * @return void
      */
-    private function migrate(PhinxApplication $app, Config $config, $stream) {
-        
+    private function migrate(PhinxApplication $app, Config $config, $stream)
+    {
         $command = [
             'command' => 'migrate'
         ];
@@ -177,13 +214,15 @@ final class MigrationManager {
     }
     
     /**
-     * Rollback a migration
-     * @param PhinxApplication $app
-     * @param Config $config
-     * @param Stream $stream
+     * Rollback from a migration
+     * 
+     * @param Phinx\Console\PhinxApplication $app
+     * @param Phinx\Config\Config $config
+     * @param resource $stream
+     * @return void
      */
-    private function rollback(PhinxApplication $app, Config $config, $stream) {
-        
+    private function rollback(PhinxApplication $app, Config $config, $stream)
+    {
         $command = [
             'command' => 'rollback'
         ];
@@ -215,13 +254,15 @@ final class MigrationManager {
     }
     
     /**
-     * Shows the current migrations status
-     * @param PhinxApplication $app
-     * @param Config $config
-     * @param Stream $stream
+     * Shows the migration status
+     * 
+     * @param Phinx\Console\PhinxApplication $app
+     * @param Phinx\Config\Config $config
+     * @param resource $stream
+     * @return void
      */
-    private function status(PhinxApplication $app, Config $config, $stream) {
-        
+    private function status(PhinxApplication $app, Config $config, $stream)
+    {
         $command = [
             'command' => 'status'
         ];
@@ -238,13 +279,15 @@ final class MigrationManager {
     }
     
     /**
-     * Creates a seed migration definition class
-     * @param PhinxApplication $app
-     * @param Config $config
-     * @param Stream $stream
+     * Creates a seed migration definition file
+     * 
+     * @param Phinx\Console\PhinxApplication $app
+     * @param Phinx\Config\Config $config
+     * @param resource $stream
+     * @return void
      */
-    private function seedcreate(PhinxApplication $app, Config $config, $stream) {
-        
+    private function seedcreate(PhinxApplication $app, Config $config, $stream)
+    {
         $command = [
             'command' => 'seed:create',
             'name' => 'Seed' . Security::generateToken(5)
@@ -268,13 +311,14 @@ final class MigrationManager {
     }
     
     /**
-     * Runs a seed definition class
-     * @param PhinxApplication $app
-     * @param Config $config
-     * @param Stream $stream
+     * Runs a seed definition
+     * 
+     * @param Phinx\Console\PhinxApplication $app
+     * @param Phinx\Config\Config $config
+     * @param resource $stream
      */
-    private function seedrun(PhinxApplication $app, Config $config, $stream) {
-        
+    private function seedrun(PhinxApplication $app, Config $config, $stream)
+    {
         $command = [
             'command' => 'seed:run'
         ];

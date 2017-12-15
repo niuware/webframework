@@ -1,31 +1,43 @@
 <?php 
-
 /**
-* This class is part of the core of Niuware WebFramework 
-* and is not particularly intended to be modified.
-* For information about the license please visit the 
-* GIT repository at:
-* https://github.com/niuware/web-framework
-*/
+ * 
+ * This class is part of the core of Niuware WebFramework 
+ * and it is not particularly intended to be modified.
+ * For information about the license please visit the 
+ * GIT repository at:
+ * 
+ * https://github.com/niuware/web-framework
+ */
+
 namespace Niuware\WebFramework\Http;
     
 /**
-* Process an HTTP request
-*/
-final class HttpInput {
-    
+ * Process an HTTP request
+ */
+final class HttpInput
+{
+    /**
+     * The HTTP request method
+     * @var string 
+     */
     private $requestMethod;
 
-    function __construct($requestMethod) {
-        
+    /**
+     * Sets the request method
+     * @param string $requestMethod
+     */
+    public function __construct($requestMethod)
+    {
         $this->requestMethod = $requestMethod;
     }
     
     /**
      * Parse POST or DELETE input data
+     * 
+     * @return array
      */
-    private function methodParse() {
-        
+    private function methodParse()
+    {
         if ($this->requestMethod === 'delete') {
             
             $result = [];
@@ -42,11 +54,13 @@ final class HttpInput {
     
     /**
      * Parses a POST or DELETE input
+     * 
      * @param array $data
      * @param array $files
+     * @return void
      */
-    public function parse(&$data, &$files) {
-        
+    public function parse(&$data, &$files)
+    {
         $data = null;
         $files = null;
         
@@ -68,11 +82,13 @@ final class HttpInput {
     }
 
     /**
-    * Instantiate a new API class object to execute an 
-    * API call, depending on the type of HTTP requested method
-    */
-    public function withApi() {
-
+     * Instantiates a \Niuware\WebFramework\Http\Api object depending on the 
+     * type of HTTP requested method
+     *
+     * @return void 
+     */
+    public function withApi()
+    {
         $api = new Api($this->requestMethod);
         
         if ($this->requestMethod === 'post' || $this->requestMethod === 'delete') {
@@ -97,16 +113,19 @@ final class HttpInput {
     }
     
     /**
-     * Gets the Request instance for the current Http request
-     * @param type $controller
-     * @param type $action
-     * @param type $subSpace
+     * Gets the Request instance for the current HTTP request
+     * 
+     * @param string $controller
+     * @param string $action
+     * @param string $subSpace
      * @param array $params
-     * @return \Niuware\WebFramework\Http\HttpRequest
+     * @param string $defaultRequestClass
+     * @return \Niuware\WebFramework\Http\Request
+     * 
      * @throws \Exception
      */
-    public function getRequestInstance($controller, $action, $subSpace, array $params, $defaultRequestClass = "") {
-        
+    public function getRequestInstance($controller, $action, $subSpace, array $params, $defaultRequestClass = "")
+    {
         if (empty($params)) {
             
             $params = ['params' => null, 'files' => null, 'requestUri' => null, 'app' => null];
@@ -142,13 +161,14 @@ final class HttpInput {
     
     /**
      * Gets the Request class name
-     * @param type $controller
-     * @param type $action
-     * @param type $subSpace
+     * 
+     * @param string $controller
+     * @param string $action
+     * @param string $subSpace
      * @return string
      */
-    private function getRequestClassName($controller, $action, $subSpace, $defaultRequestClass) {
-        
+    private function getRequestClassName($controller, $action, $subSpace, $defaultRequestClass)
+    {
         $requestClass = "\App\Requests\\";
         
         if ($subSpace !== 'main') {

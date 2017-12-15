@@ -1,12 +1,14 @@
 <?php 
-
 /**
-* This class is part of the core of Niuware WebFramework 
-* and is not particularly intended to be modified.
-* For information about the license please visit the 
-* GIT repository at:
-* https://github.com/niuware/web-framework
-*/
+ * 
+ * This class is part of the core of Niuware WebFramework 
+ * and it is not particularly intended to be modified.
+ * For information about the license please visit the 
+ * GIT repository at:
+ * 
+ * https://github.com/niuware/web-framework
+ */
+
 namespace Niuware\WebFramework\Http;
 
 use Niuware\WebFramework\Auth\Auth;
@@ -14,50 +16,127 @@ use Niuware\WebFramework\Auth\Auth;
 use App\Config\Routes;
 
 /**
-* Process the URL to the correct route
-*/
-class Router {
-
+ * Process a route
+ */
+class Router
+{
+    /**
+     * The route path
+     * 
+     * @var array 
+     */
     private $path;
 
+    /**
+     * A flag to determine if a route error has occurred
+     * 
+     * @var bool 
+     */
     private $error = true;
     
+    /**
+     * The HTTP request method
+     * 
+     * @var string 
+     */
     private $requestMethod;
     
+    /**
+     * The URL query
+     * 
+     * @var array 
+     */
     private $queryString = [];
     
+    /**
+     * The requested URI
+     * 
+     * @var string 
+     */
     private $currentUri = "";
     
+    /**
+     * A flag to determine if the route requires an authentication
+     * 
+     * @var bool 
+     */
     private $routeRequireLogin = false;
     
+    /**
+     * A flag to determine if the route requires a valid CSRF token
+     * 
+     * @var bool 
+     */
     private $routeRequireCsrf = false;
     
+    /**
+     * A flag to determine if the route is in the Application Admin Space
+     * 
+     * @var bool 
+     */
     private $routeIsAdmin = false;
     
+    /**
+     * The route controller path
+     * 
+     * @var string 
+     */
     private $routeControllerPath;
     
+    /**
+     * The route controller name
+     * 
+     * @var string 
+     */
     private $routeController;
     
+    /**
+     * The route controller action
+     * 
+     * @var string 
+     */
     private $routeAction = "";
     
+    /**
+     * The route request class name
+     * 
+     * @var string 
+     */
     private $routeRequest = "";
     
+    /**
+     * The route mapped parameters
+     * 
+     * @var array 
+     */
     private $routeMappedParams = [];
     
+    /**
+     * The route Application Space
+     * 
+     * @var string 
+     */
     private $routeMode = "main";
 
-    function __construct() {
-
+    /**
+     * Initializes the Router
+     * 
+     * @return void
+     */
+    public function __construct()
+    {
         $this->initialize();
 
         $this->redirectFail();
     }
 
     /**
-    * Parse the request URL and executes the routing
-    */
-    private function initialize() {
-        
+     * Runs the routing
+     * 
+     * @return void
+     */
+    private function initialize()
+    {
         $this->setRequestMethod();
 
         if (\App\Config\BASE_PATH === '/') {
@@ -85,10 +164,12 @@ class Router {
     }
     
     /**
-     * Set loading route parameters based on the current URL
+     * Sets the loaded route parameters
+     * 
+     * @return void
      */
-    private function parseRoute() {
-        
+    private function parseRoute()
+    {
         $parser = new RouteParser($this->path, $this->requestMethod);
         
         $parser->parse();
@@ -100,10 +181,12 @@ class Router {
     
     /**
      * Sets the path to load
-     * @param type $parsedUrl
+     * 
+     * @param array $parsedUrl
+     * @return void
      */
-    private function setPath($parsedUrl) {
-        
+    private function setPath($parsedUrl)
+    {
         if (isset($parsedUrl['path'])) {
         
             $this->path = preg_split('/\//', $parsedUrl['path'], -1, \PREG_SPLIT_NO_EMPTY);
@@ -124,11 +207,13 @@ class Router {
     }
     
     /**
-     * Sets the query parameters if any
-     * @param type $parsedUrl
+     * Sets the query parameters
+     * 
+     * @param array $parsedUrl
+     * @return void
      */
-    private function setQueryString($parsedUrl) {
-        
+    private function setQueryString($parsedUrl)
+    {
         if (isset($parsedUrl['query'])) {
             
             parse_str($parsedUrl['query'], $this->queryString);
@@ -137,9 +222,11 @@ class Router {
     
     /**
      * Sets the request method
+     * 
+     * @return void
      */
-    private function setRequestMethod() {
-        
+    private function setRequestMethod()
+    {
         $requestMethod = filter_input(\App\Config\SERVER_ENV_VAR, 'REQUEST_METHOD', FILTER_SANITIZE_URL);
         
         if ($requestMethod === 'GET') {
@@ -160,10 +247,12 @@ class Router {
     }
 
     /**
-    * Executes the routing for controllers (NOT API calls or admin controllers)
-    */
-    private function redirectMain() {
-        
+     * Executes the routing for controllers in the Main Application Space
+     * 
+     * @return bool
+     */
+    private function redirectMain()
+    {
         if (!$this->routeRequireLogin) {
             
             Auth::requireAuth(false, $this->routeMode);
@@ -177,12 +266,13 @@ class Router {
     }
 
     /**
-     * Redirects to an API call or admin controller 
-     * @param type $action
-     * @return type
+     * Verifies if a redirection to an API class or Console mode
+     * is required
+     * 
+     * @return void
      */
-    private function redirectTask() {
-
+    private function redirectTask()
+    {
         if ($this->path[0] === 'api') {
             
             $input = new HttpInput($this->requestMethod);
@@ -204,21 +294,24 @@ class Router {
     }
 
     /**
-    * Sets the Router as require authenticating mode
-    */
-    private function setRequireAuthMode() {
-        
+     * Requires the authentication mode
+     * 
+     * @return bool
+     */
+    private function setRequireAuthMode()
+    {
         Auth::requireAuth(true, $this->routeMode);
 
         return $this->redirectAuthMode();
     }
 
     /**
-    * Redirects the browser to a default route, if an error was 
-    * generated by the routing
-    */
-    private function redirectFail() {
-
+     * Redirects the browser to a default route
+     * 
+     * @return void
+     */
+    private function redirectFail()
+    {
         if ($this->error) {
 
             if (!$this->routeIsAdmin) {
@@ -237,10 +330,12 @@ class Router {
     }
     
     /**
-     * Redirects the browser to the default main application route
+     * Redirects the application to the Application Main Space
+     * 
+     * @return void
      */
-    private function redirectFailMain() {
-        
+    private function redirectFailMain()
+    {
         if ($this->routeMode === 'main') {
             
             if (!empty(Routes::$views['main'])) {
@@ -257,10 +352,12 @@ class Router {
     }
     
     /**
-     * Redirects the browser to the default admin application route
+     * Redirects the application to the Application Admin Space
+     * 
+     * @return void
      */
-    private function redirectFailMode() {
-        
+    private function redirectFailMode()
+    {
         if (!empty(Routes::$views[$this->routeMode])) {
                     
             header("Location: " . \App\Config\BASE_URL . $this->routeMode . '/' . \App\Config\HOMEPAGE);
@@ -270,10 +367,12 @@ class Router {
     }
 
     /**
-    * Executes the routing for controllers requiring authentication
-    */
-    private function redirectAuthMode() {
-        
+     * Executes the routing for controllers requiring an authentication
+     * 
+     * @return bool
+     */
+    private function redirectAuthMode()
+    {
         if (!Auth::verifiedAuth($this->routeMode)) {
             
             $this->routeController = "Login";
@@ -294,11 +393,14 @@ class Router {
     }
 
     /**
-    * Returns a new instance of the requested controller
-    * @return Controller instance
-    */
-    public function getControllerInstance() {
-
+     * Gets an instance of the requested controller
+     * 
+     * @return \Niuware\WebFramework\Application\Controller
+     * 
+     * @throws \Exception
+     */
+    public function getControllerInstance()
+    {
         $controllerClass = "\App\Controllers\\";
         
         if ($this->routeMode !== 'main') {
@@ -327,38 +429,42 @@ class Router {
     }
 
     /**
-    * Returns the name of the requested view
-    * @return string View name
-    */
-    public function getControllerName() {
-
+     * Gets the name of the requested view
+     * 
+     * @return string
+     */
+    public function getControllerName()
+    {
         return $this->routeController;
     }
 
     /**
      * Gets the controller action name (method to execute)
-     * @return type
+     * 
+     * @return string
      */
-    public function getControllerAction() {
-        
+    public function getControllerAction()
+    {
         return $this->routeAction;
     }
     
     /**
      * Gets the controller action name without hyphens
-     * @return type
+     * 
+     * @return string
      */
-    public function getFilteredControllerAction() {
-        
+    public function getFilteredControllerAction()
+    {
         return str_replace(['-', '_'], '', $this->routeAction);
     }
 
     /**
-     * Gets the parameters for the current method (Uri query)
+     * Gets the parameters for the requested method
+     * 
      * @return array
      */
-    public function getControllerParams() {
-            
+    public function getControllerParams()
+    {
         $allParams = array_merge($this->routeMappedParams, $this->queryString);
         
         $postParams = null;
@@ -396,29 +502,32 @@ class Router {
     }
     
     /**
-     * Returns true if the current routing requires admin validation
+     * Verifies an Application Admin Space route
+     * 
      * @return bool
      */
-    public function isAdmin() {
-        
+    public function isAdmin()
+    {
         return $this->routeIsAdmin;
     }
     
     /**
      * Gets the request method
+     * 
      * @return string
      */
-    public function getRequestMethod() {
-        
+    public function getRequestMethod()
+    {
         return $this->requestMethod;
     }
     
     /**
-     * Gets a default view name based on the requested path
+     * Gets the default view name based on the requested path
+     * 
      * @return string
      */
-    public function getDefaultView() {
-        
+    public function getDefaultView()
+    {
         $viewName = '';
         
         if ($this->routeMode !== 'main') {
@@ -439,11 +548,12 @@ class Router {
     
     /**
      * Redirects the browser to a path
-     * @param type $path
-     * @return type
+     * 
+     * @param \Niuware\WebFramework\Http\Response|string|null $path
+     * @return void
      */
-    public function redirect($path) {
-        
+    public function redirect($path)
+    {
         if ($path === null) {
             
             return;

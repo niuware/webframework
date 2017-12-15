@@ -1,56 +1,84 @@
 <?php 
-
 /**
-* This class is part of the core of Niuware WebFramework 
-* and is not particularly intended to be modified.
-* For information about the license please visit the 
-* GIT repository at:
-* https://github.com/niuware/web-framework
-*/
+ * 
+ * This class is part of the core of Niuware WebFramework 
+ * and it is not particularly intended to be modified.
+ * For information about the license please visit the 
+ * GIT repository at:
+ * 
+ * https://github.com/niuware/web-framework
+ */
+
 namespace Niuware\WebFramework\Validation;
 
 use Niuware\WebFramework\Http\Request;
     
 /**
-* Validates a request
-*/
-final class Validate {
-    
+ * Validates a Request
+ */
+final class Validate
+{
+    /**
+     * The validation rules
+     * @var array 
+     */
     private $rules;
     
+    /**
+     * The Request to validate
+     * @var Niuware\WebFramework\Http\Request 
+     */
     private $request;
     
+    /**
+     * The validation errors
+     * 
+     * @var array 
+     */
     private $errors = [];
     
-    function __construct(Request $request, $rules = []) {
-        
+    /**
+     * Initializes the validation
+     * 
+     * @param Niuware\WebFramework\Http\Request $request
+     * @param array $rules
+     * @return void
+     */
+    public function __construct(Request $request, $rules = [])
+    {
         $this->setRequest($request);
         $this->setRules($rules);
     }
     
     /**
-     * Sets the rules array to validate
+     * Sets the rules to validate
+     * 
      * @param array $rules
+     * @return void
      */
-    public function setRules(array $rules) {
-        
+    public function setRules(array $rules)
+    {
         $this->rules = $rules;
     }
     
     /**
      * Sets the Request object to validate
-     * @param Request $request
+     * 
+     * @param Niuware\WebFramework\Http\Request $request
+     * @return void
      */
-    public function setRequest(Request $request) {
-        
+    public function setRequest(Request $request)
+    {
         $this->request = $request;
     }
     
     /**
-     * Runs the validation rules over the request
+     * Runs the validation rules against the request
+     * 
+     * @return void
      */
-    public function run() {
-        
+    public function run()
+    {
         foreach ($this->rules as $field => $rules) {
             
             $this->validateField($field, $rules);
@@ -58,29 +86,32 @@ final class Validate {
     }
     
     /**
-     * Validation is valid?
+     * Verifies the validation
+     * 
      * @return bool
      */
-    public function isValid() {
-        
+    public function isValid()
+    {
         return empty($this->errors);
     }
     
     /**
-     * Get all validation errors
-     * @return type
+     * Gets all validation errors
+     * 
+     * @return array
      */
-    public function getErrors() {
-        
+    public function getErrors()
+    {
         return $this->errors;
     }
     
     /**
-     * Returns the first error
-     * @return type
+     * Gets the first detected error
+     * 
+     * @return array
      */
-    public function getFirstError() {
-        
+    public function getFirstError()
+    {
         if (!empty($this->errors)) {
             
             $first = reset($this->errors);
@@ -97,11 +128,12 @@ final class Validate {
     }
     
     /**
-     * Returns the last error
-     * @return type
+     * Gets the last detected error
+     * 
+     * @return array
      */
-    public function getLastError() {
-        
+    public function getLastError()
+    {
         if (!empty($this->errors)) {
             
             $last = end($this->errors);
@@ -119,11 +151,13 @@ final class Validate {
     
     /**
      * Validate a field in the request
-     * @param type $field
-     * @param type $rules
+     * 
+     * @param name $field
+     * @param array $rules
+     * @return void
      */
-    private function validateField($field, $rules) {
-        
+    private function validateField($field, $rules)
+    {
         foreach ($rules as $rule => $msg) {
             
             $args = $this->parseRule($rule);
@@ -147,12 +181,13 @@ final class Validate {
     }
     
     /**
-     * Parses the rule name and its parameters
-     * @param type $rule
-     * @return type
+     * Parses the rule name and its arguments
+     * 
+     * @param array $rule
+     * @return array
      */
-    private function parseRule($rule) {
-        
+    private function parseRule($rule)
+    {
         $args = explode('|', $rule);
         
         if (!isset($args[0])) {
@@ -169,14 +204,15 @@ final class Validate {
     }
     
     /**
-     * Execute numeric rules
-     * @param type $field
-     * @param type $args
-     * @param type $msg
-     * @return boolean
+     * Run numeric rules
+     * 
+     * @param string $field
+     * @param array $args
+     * @param string $msg
+     * @return bool
      */
-    private function numericRules($field, $args, $msg) {
-        
+    private function numericRules($field, $args, $msg)
+    {
         if ($this->numeric($field, $args, $msg)) {
             return true;
         }
@@ -193,14 +229,15 @@ final class Validate {
     }
     
     /**
-     * Execute field mutable rules
-     * @param type $field
-     * @param type $args
-     * @param type $msg
-     * @return boolean
+     * Run field mutable rules
+     * 
+     * @param string $field
+     * @param array $args
+     * @param string $msg
+     * @return bool
      */
-    private function mutableRules($field, $args, $msg) {
-        
+    private function mutableRules($field, $args, $msg)
+    {
         if ($this->defaultIfNull($field, $args, $msg)) {
             return true;
         }
@@ -217,14 +254,15 @@ final class Validate {
     }
     
     /**
-     * Validates the required rule over a field
-     * @param type $field
-     * @param type $args
-     * @param type $msg
-     * @return boolean
+     * Requires the existence of a field
+     * 
+     * @param string $field
+     * @param array $args
+     * @param string $msg
+     * @return bool
      */
-    private function required($field, $args, $msg) {
-        
+    private function required($field, $args, $msg)
+    {
         if ($args[0] === 'required') {
             
             if (!$this->request->has($field, $args[1])) {
@@ -239,14 +277,15 @@ final class Validate {
     }
     
     /**
-     * Validates the minlength rule over a field
-     * @param type $field
-     * @param type $args
-     * @param type $msg
-     * @return boolean
+     * Requires a minimum length for the value of a field
+     * 
+     * @param string $field
+     * @param array $args
+     * @param string $msg
+     * @return bool
      */
-    private function minlength($field, $args, $msg) {
-        
+    private function minlength($field, $args, $msg)
+    {
         if ($args[0] === 'minlength') {
             
             if (strlen($this->request->$field) < $args[1]) {
@@ -261,14 +300,15 @@ final class Validate {
     }
     
     /**
-     * Validates the maxlength rule over a field
-     * @param type $field
-     * @param type $args
-     * @param type $msg
-     * @return boolean
+     * Requires a maximum length for the value of a field
+     * 
+     * @param string $field
+     * @param array $args
+     * @param string $msg
+     * @return bool
      */
-    private function maxlength($field, $args, $msg) {
-        
+    private function maxlength($field, $args, $msg)
+    {
         if ($args[0] === 'maxlength') {
             
             if (strlen($this->request->$field) > $args[1]) {
@@ -283,14 +323,15 @@ final class Validate {
     }
     
     /**
-     * Validates the pattern rule over a field
-     * @param type $field
-     * @param type $args
-     * @param type $msg
-     * @return boolean
+     * Requires a matching pattern for the value of a field
+     * 
+     * @param string $field
+     * @param array $args
+     * @param string $msg
+     * @return bool
      */
-    private function pattern($field, $args, $msg) {
-        
+    private function pattern($field, $args, $msg)
+    {
         if ($args[0] === 'pattern') {
             
             if (!preg_match($args[1], $this->request->$field)) {
@@ -305,14 +346,15 @@ final class Validate {
     }
     
     /**
-     * Validates the pattern rule over a field
-     * @param type $field
-     * @param type $args
-     * @param type $msg
-     * @return boolean
+     * Requires a numeric string for the value of a field
+     * 
+     * @param string $field
+     * @param array $args
+     * @param string $msg
+     * @return bool
      */
-    private function numeric($field, $args, $msg) {
-        
+    private function numeric($field, $args, $msg)
+    {
         if ($args[0] === 'numeric') {
             
             if (!is_numeric($this->request->$field)) {
@@ -327,14 +369,16 @@ final class Validate {
     }
     
     /**
-     * Set a value if the field is null or different from the default value
-     * @param type $field
-     * @param type $args
-     * @param type $msg
-     * @return boolean
+     * Sets a value for the field if it is null or 
+     * different from the default value
+     * 
+     * @param string $field
+     * @param array $args
+     * @param string $msg
+     * @return bool
      */
-    private function defaultIfNull($field, $args, $msg) {
-        
+    private function defaultIfNull($field, $args, $msg)
+    {
         if ($args[0] === 'default') {
             
             if ($args[1] !== null) {
@@ -358,13 +402,14 @@ final class Validate {
     
     /**
      * Cast the field value to the given type
-     * @param type $field
-     * @param type $args
-     * @param type $msg
-     * @return boolean
+     * 
+     * @param string $field
+     * @param array $args
+     * @param string $msg
+     * @return bool
      */
-    private function cast($field, $args, $msg) {
-        
+    private function cast($field, $args, $msg)
+    {
         if ($args[0] === 'cast') {
             
             $types = ['bool', 'int', 'double', 'object', 'string', 'array'];
@@ -386,13 +431,14 @@ final class Validate {
     
     /**
      * Executes a callback function in the field
-     * @param type $field
-     * @param type $args
-     * @param type $msg
-     * @return boolean
+     * 
+     * @param string $field
+     * @param array $args
+     * @param string $msg
+     * @return bool
      */
-    private function callback($field, $args, $msg) {
-        
+    private function callback($field, $args, $msg)
+    {
         if ($args[0] === 'callback') {
                 
             if ($this->request->has($field) && function_exists($msg)) {
@@ -417,12 +463,14 @@ final class Validate {
     
     /**
      * Appends a validation error on the errors array
-     * @param type $field
-     * @param type $rule
-     * @param type $error
+     * 
+     * @param string $field
+     * @param string $rule
+     * @param string $error
+     * @return void
      */
-    private function appendError($field, $rule, $error) {
-        
+    private function appendError($field, $rule, $error)
+    {
         if (!isset($this->errors[$field])) {
          
             $this->errors[$field] = [];

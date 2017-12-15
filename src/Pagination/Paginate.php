@@ -1,12 +1,14 @@
-<?php
-
+<?php 
 /**
-* This class is part of the core of Niuware WebFramework 
-* and is not particularly intended to be modified.
-* For information about the license please visit the 
-* GIT repository at:
-* https://github.com/niuware/web-framework
-*/
+ * 
+ * This class is part of the core of Niuware WebFramework 
+ * and it is not particularly intended to be modified.
+ * For information about the license please visit the 
+ * GIT repository at:
+ * 
+ * https://github.com/niuware/web-framework
+ */
+
 namespace Niuware\WebFramework\Pagination;
 
 use Niuware\WebFramework\Http\Request;
@@ -15,14 +17,29 @@ use Illuminate\Database\Eloquent\Collection;
 /**
  * Paginates data collections into chunks
  */
-final class Paginate {
-    
+final class Paginate
+{
+    /**
+     * The pagination attributes
+     * 
+     * @var array 
+     */
     private $attributes = [];
     
+    /**
+     * The pagination data
+     * 
+     * @var \Illuminate\Database\Eloquent\Collection 
+     */
     private $data;
     
-    public function __construct() {
-        
+    /**
+     * Initializes the default pagination attributes
+     * 
+     * @return void
+     */
+    public function __construct()
+    {
         $this->itemsPerPage = 15;
         $this->currentPage = 1;
         $this->previousPage = 1;
@@ -32,26 +49,41 @@ final class Paginate {
         $this->renderedItemsMax = 8;
     }
     
-    public function __get($name) {
-            
+    /**
+     * Gets a pagination attribute
+     * 
+     * @param string $name
+     * @return mixed
+     */
+    public function __get($name)
+    {
         return $this->attributes[$name];
     }
     
-    public function __set($name, $value) {
-            
+    /**
+     * Sets a pagination attribute
+     * 
+     * @param string $name
+     * @param mixed $value
+     * @return void
+     */
+    public function __set($name, $value)
+    {
         $this->attributes[$name] = $value;
     }
     
     /**
      * Sets the pagination base URL
-     * @param string $uri
+     * 
+     * @param string $sourceUrl
+     * @return void
      */
-    private function setUrl($uri) {
-        
-        $rawUrl = parse_url($uri);
+    private function setUrl($sourceUrl)
+    {
+        $rawUrl = parse_url($sourceUrl);
         $rawQuery = (isset($rawUrl['query'])) ? $rawUrl['query'] : "";
 
-        $url = str_replace($rawQuery, '', $uri);
+        $url = str_replace($rawQuery, '', $sourceUrl);
 
         $query = preg_replace('/([\?|&]{0,1}p=\d*)/i', '', $rawQuery);
 
@@ -96,11 +128,12 @@ final class Paginate {
     
     /**
      * Generates the pagination
-     * @param type $data
-     * @param type $request
+     * 
+     * @param \Illuminate\Database\Eloquent\Collection $data
+     * @param \Niuware\WebFramework\Http\Request $request
      */
-    private function init($data, $request) {
-        
+    private function init($data, $request)
+    {
         $this->totalPages = $data->chunk($this->itemsPerPage)->count();
 
         if ($this->totalPages > 1) {
@@ -136,14 +169,15 @@ final class Paginate {
     
     /**
      * Renders the HTML code for a pagination item
-     * @param type $i
-     * @param type $itemClass
-     * @param type $activeClass
-     * @param type $linkClass
+     * 
+     * @param int $i
+     * @param string $itemClass
+     * @param string $activeClass
+     * @param string $linkClass
      * @return string
      */
-    private function renderItem($i, $itemClass, $activeClass, $linkClass) {
-        
+    private function renderItem($i, $itemClass, $activeClass, $linkClass)
+    {
         $html = '<li class="' . $itemClass . ' ';
         $html.= ($i == $this->currentPage) ? $activeClass : '';
         $html.= '">';
@@ -156,12 +190,13 @@ final class Paginate {
     
     /**
      * Renders the HTML code for a pagination ellipsis item
-     * @param type $itemClass
-     * @param type $linkClass
+     * 
+     * @param string $itemClass
+     * @param string $linkClass
      * @return string
      */
-    private function renderEllipsisItem($itemClass, $linkClass) {
-
+    private function renderEllipsisItem($itemClass, $linkClass)
+    {
         $html = '<li class="' . $itemClass . '">';
         $html.= '<a class="' . $linkClass . '"';
         $html.= '">...</a></li>';
@@ -171,13 +206,14 @@ final class Paginate {
     
     /**
      * Renders the HTML code for a pagination with clipping mode
-     * @param type $itemClass
-     * @param type $activeClass
-     * @param type $linkClass
+     * 
+     * @param string $itemClass
+     * @param string $activeClass
+     * @param string $linkClass
      * @return string
      */
-    private function renderWithClipping($itemClass, $activeClass, $linkClass) {
-        
+    private function renderWithClipping($itemClass, $activeClass, $linkClass)
+    {
         $start = 1;
         $end = $this->totalPages;
         $itemsToRender = $this->renderedItemsMax;
@@ -218,12 +254,14 @@ final class Paginate {
     
     /**
      * Calculate the indexes for rendering the pagination HTML code
-     * @param type $start
-     * @param type $end
-     * @param type $itemsToRender
+     * 
+     * @param int $start
+     * @param int $end
+     * @param int $itemsToRender
+     * @return void
      */
-    private function calculateClippingIndexes(&$start, &$end, &$itemsToRender) {
-        
+    private function calculateClippingIndexes(&$start, &$end, &$itemsToRender)
+    {
         $startOffset = 3;
         $itemsToRender = $this->renderedItemsMax - $startOffset;
         $startTemp = ($this->currentPage == 1) ? 2 : $this->currentPage;
@@ -245,32 +283,36 @@ final class Paginate {
     
     /**
      * Paginates the data
-     * @param Illuminate\Database\Eloquent\Collection $data
-     * @param HttpRequest $request
+     * 
+     * @param \Illuminate\Database\Eloquent\Collection $data
+     * @param \Niuware\WebFramework\Http\Request $request
+     * @return void
      */
-    public function paginate(Collection $data, Request $request) {
-  
+    public function paginate(Collection $data, Request $request)
+    {
         $this->init($data, $request);
     }
     
     /**
-     * Returns the chunk of data for the current HttpRequest
+     * Returns the chunk of data for the current Request
+     * 
      * @return Illuminate\Database\Eloquent\Collection
      */
-    public function data() {
-        
+    public function data()
+    {
         return $this->data; 
     }
     
     /**
      * Returns the string for the 'previous link'
+     * 
      * @param string $label
      * @param string $itemClass
      * @param string $linkClass
      * @return string
      */
-    public function previousLink($label = '&lt;', $itemClass = 'page-item', $linkClass = 'page-link') {
-        
+    public function previousLink($label = '&lt;', $itemClass = 'page-item', $linkClass = 'page-link')
+    {
         $html = '<li class="' . $itemClass . '">';
         $html.= '<a class="' . $linkClass . '" href="';
         $html.= $this->url . $this->previousPage . '"';
@@ -285,13 +327,14 @@ final class Paginate {
     
     /**
      * Returns the string for the 'next link'
+     * 
      * @param string $label
      * @param string $itemClass
      * @param string $linkClass
      * @return string
      */
-    public function nextLink($label = '&gt;', $itemClass = 'page-item', $linkClass = 'page-link') {
-        
+    public function nextLink($label = '&gt;', $itemClass = 'page-item', $linkClass = 'page-link')
+    {
         $html = '<li class="' . $itemClass . '">';
         $html.= '<a class="' . $linkClass . '" href="';
         $html.= $this->url . $this->nextPage . '"';
@@ -306,13 +349,17 @@ final class Paginate {
         
     /**
      * Renders the HTML code for the pagination
+     * 
      * @param string $previousLabel
      * @param string $nextLabel
      * @param string $itemClass
      * @param string $linkClass
      * @param string $activeClass
+     * @return void
      */
-    public function render($previousLabel = '&lt;', $nextLabel = '&gt;', $itemClass = 'page-item', $linkClass = 'page-link', $activeClass = 'active') {
+    public function render($previousLabel = '&lt;', $nextLabel = '&gt;', 
+            $itemClass = 'page-item', $linkClass = 'page-link', $activeClass = 'active')
+    {
         
         $html = $this->previousLink($previousLabel, $itemClass, $linkClass, $activeClass);
         
@@ -341,11 +388,12 @@ final class Paginate {
     }
     
     /**
-     * Verifies if it is necessary to render the pagination HTML
+     * Verifies the necessity to render the pagination HTML
+     * 
      * @return boolean
      */
-    public function shouldRender() {
-        
+    public function shouldRender()
+    {
         if ($this->totalPages > 1) {
             
             return true;

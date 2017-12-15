@@ -1,12 +1,14 @@
-<?php
-
+<?php 
 /**
-* This class is part of the core of Niuware WebFramework 
-* and is not particularly intended to be modified.
-* For information about the license please visit the 
-* GIT repository at:
-* https://github.com/niuware/web-framework
-*/
+ * 
+ * This class is part of the core of Niuware WebFramework 
+ * and it is not particularly intended to be modified.
+ * For information about the license please visit the 
+ * GIT repository at:
+ * 
+ * https://github.com/niuware/web-framework
+ */
+
 namespace Niuware\WebFramework\Http;
 
 use Niuware\WebFramework\Auth\Security;
@@ -15,29 +17,65 @@ use Niuware\WebFramework\Validation\Validate;
 /**
  * Base class for a request
  */
-abstract class Request {
-    
+abstract class Request
+{
+    /**
+     * The request headers
+     * 
+     * @var array 
+     */
     private $headers = [];
     
+    /**
+     * The request attributes
+     * 
+     * @var array 
+     */
     private $attributes = [];
     
+    /**
+     * The request files
+     * 
+     * @var array 
+     */
     private $files = [];
     
+    /**
+     * The request application attributes
+     * 
+     * @var type 
+     */
     private $app = [];
     
+    /**
+     * The validation instance
+     * 
+     * @var Niuware\WebFramework\Validation\Validate 
+     */
     private $validate;
     
+    /**
+     * The request method
+     * 
+     * @var string 
+     */
     private $method = "";
     
+    /**
+     * A flag that determines if the request has a valid CSRF token
+     * 
+     * @var bool 
+     */
     private $csrfValid = false;
     
     /**
      * Gets a request property
+     * 
      * @param string $name
      * @return mixed
      */
-    public function __get($name) {
-
+    public function __get($name)
+    {
         if (isset($this->attributes[$name])) {
             
             return $this->attributes[$name];
@@ -48,16 +86,24 @@ abstract class Request {
 
     /**
      * Sets a request property
+     * 
      * @param string $name
-     * @param string $value
+     * @param mixed $value
      */
-    public function __set($name, $value) {
-
+    public function __set($name, $value)
+    {
         $this->attributes[$name] = $value;
     }
 
-    function __construct(array $params, $method = "") {
-        
+    /**
+     * Initializes the request
+     * 
+     * @param array $params
+     * @param string $method
+     * @return void
+     */
+    public function __construct(array $params, $method = "")
+    {
         $parameters = (isset($params['params'])) ? $params['params'] : [];
         $files = (isset($params['files'])) ? $params['files'] : null;
         $requestUri = (isset($params['requestUri'])) ? $params['requestUri'] : null;
@@ -103,16 +149,24 @@ abstract class Request {
         $this->validate = new Validate($this);
     }
     
-    private function verifyCsrfToken($token) {
-        
+    /**
+     * Validates a CSRF token
+     * 
+     * @param string $token
+     * @return void
+     */
+    private function verifyCsrfToken($token)
+    {
         $this->csrfValid = Security::verifyCsrfToken($token);
     }
     
     /**
-     * Sets all HTTP headers
+     * Sets all HTTP request headers
+     * 
+     * @return void
      */
-    private function setHeaders() {
-        
+    private function setHeaders()
+    {
         if (function_exists('getallheaders')) {
             
             $this->headers = getallheaders();
@@ -134,41 +188,45 @@ abstract class Request {
     }
     
     /**
-     * Gets all HTTP headers
+     * Gets all HTTP request headers
+     * 
      * @return array
      */
-    public function headers() {
-        
+    public function headers()
+    {
         return $this->headers;
     }
     
     /**
-     * Gets an HTTP header value if exists
+     * Gets an HTTP header value
+     * 
      * @param string $name
      * @return string
      */
-    public function header($name) {
-        
+    public function header($name)
+    {
         return (isset($this->headers[$name])) ? $this->headers[$name] : '';
     }
     
     /**
-     * Gets all App info
-     * @return array
+     * Gets the application details
+     * 
+     * @return object
      */
-    public function app() {
-        
+    public function app()
+    {
         return (object)$this->app;
     }
     
     /**
-     * Verifies if a request parameter is set
-     * @param type $parameter
-     * @param boolean $emptyIsValid
-     * @return boolean
+     * Verifies a request parameter
+     * 
+     * @param string $parameter
+     * @param bool $emptyIsValid
+     * @return bool
      */
-    private function hasParameter($parameter, $emptyIsValid) {
-        
+    private function hasParameter($parameter, $emptyIsValid)
+    {
         $value = $this->{$parameter};
         
         if ($value === null) {
@@ -176,6 +234,8 @@ abstract class Request {
              return false;
         }
         
+        // If $emptyIsValid is true, an empty string 
+        // is considered as a valid value
         if ($emptyIsValid === false) {
             
             if (empty($value)) {
@@ -188,13 +248,14 @@ abstract class Request {
     }
     
     /**
-     * Verifies if all request parameters are set
+     * Verifies all request parameters are set
+     * 
      * @param array $parameters
-     * @param boolean $emptyIsValid
-     * @return boolean
+     * @param bool $emptyIsValid
+     * @return bool
      */
-    private function hasParameters(array $parameters, $emptyIsValid) {
-        
+    private function hasParameters(array $parameters, $emptyIsValid)
+    {
         foreach ($parameters as $parameter) {
             
             if (!$this->hasParameter($parameter, $emptyIsValid)) {
@@ -207,13 +268,14 @@ abstract class Request {
     }
     
     /**
-     * Verifies if request parameters are set
+     * Verifies multiple request parameters
+     * 
      * @param mixed $value
-     * @param boolean $emptyIsValid If true, an empty string is considered as a valid value
-     * @return boolean
+     * @param bool $emptyIsValid
+     * @return bool
      */
-    public function has($value, $emptyIsValid = false) {
-        
+    public function has($value, $emptyIsValid = false)
+    {
         if (!is_array($value)) {
             
             return $this->hasParameter($value, $emptyIsValid);
@@ -223,12 +285,13 @@ abstract class Request {
     }
     
     /**
-     * Verifies if a file exists
-     * @param type $file
-     * @return boolean
+     * Verifies the existence of a file within the request
+     * 
+     * @param string $file
+     * @return bool
      */
-    public function hasFile($file) {
-        
+    public function hasFile($file)
+    {
         if (isset($this->files[$file])) {
             
             return true;
@@ -239,11 +302,12 @@ abstract class Request {
     
     /**
      * Gets a file
-     * @param type $file
-     * @return File
+     * 
+     * @param string $file
+     * @return \Niuware\WebFramework\Http\File
      */
-    public function getFile($file) {
-        
+    public function getFile($file)
+    {
         if ($this->hasFile($file)) {   
             
             return new File($this->files[$file]);
@@ -253,29 +317,33 @@ abstract class Request {
     }
     
     /**
-     * Returns if the request has a valid CSRF valid token
-     * @return type
+     * Verifies a valid CSRF token in the request
+     * 
+     * @return bool
      */
-    public function hasValidCsrf() {
-        
+    public function hasValidCsrf()
+    {
         return $this->csrfValid;
     }
     
     /**
-     * Returns this request Validate instance
+     * Returns the validation instance
+     * 
      * @return \Niuware\WebFramework\Validation\Validate
      */
-    public function validation() {
-        
+    public function validation()
+    {
         return $this->validate;
     }
     
     /**
-     * Validates the request with the provided request method rules
-     * @param type $rules
+     * Validates the request against the provided rules
+     * 
+     * @param array $rules
+     * @return void
      */
-    protected function validateWith($rules) {
-        
+    protected function validateWith($rules)
+    {
         $methodRules = (isset($rules[$this->method])) ? $rules[$this->method] : [];
         
         $this->validate->setRules($methodRules);

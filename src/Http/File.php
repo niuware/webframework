@@ -1,27 +1,45 @@
-<?php
-
+<?php 
 /**
-* This class is part of the core of Niuware WebFramework 
-* and is not particularly intended to be modified.
-* For information about the license please visit the 
-* GIT repository at:
-* https://github.com/niuware/web-framework
-*/
+ * 
+ * This class is part of the core of Niuware WebFramework 
+ * and it is not particularly intended to be modified.
+ * For information about the license please visit the 
+ * GIT repository at:
+ * 
+ * https://github.com/niuware/web-framework
+ */
+
 namespace Niuware\WebFramework\Http;
 
 use Niuware\WebFramework\Auth\Security;
 
 /**
- * File helper class
+ * File handling
  */
-final class File {
-    
+final class File
+{
+    /**
+     * The HTTP file request attributes
+     * 
+     * @var array 
+     */
     private $original_request = [];
     
+    /**
+     * The file type
+     * 
+     * @var string 
+     */
     public $filetype;
     
-    public function __construct($attributes = null) {
-        
+    /**
+     * Initializes the default attributes
+     * 
+     * @param array $attributes
+     * @return void
+     */
+    public function __construct($attributes = null)
+    {
         $this->set($attributes, 'name');
         $this->set($attributes, 'type');
         $this->set($attributes, 'tmp_name');
@@ -29,8 +47,16 @@ final class File {
         $this->set($attributes, 'size');
     }
     
-    private function set($array, $name, $direct = false) {
-        
+    /**
+     * Sets the file attributes
+     * 
+     * @param array $array
+     * @param string $name
+     * @param bool $direct
+     * @return void
+     */
+    private function set($array, $name, $direct = false)
+    {
         if ($direct === true) {
         
             $this->$name = $array[$name];
@@ -44,8 +70,14 @@ final class File {
         }
     }
     
-    public function __get($name) {
-        
+    /**
+     * Gets a file attribute
+     * 
+     * @param string $name
+     * @return mixed|null
+     */
+    public function __get($name)
+    {
         if (isset($this->$name)) {
             
             return $this->$name;
@@ -55,12 +87,14 @@ final class File {
     }
     
     /**
-     * Gets the path for a file based on the MIME type
-     * @param type $path
-     * @return type
+     * Gets the path for the file based on the MIME type
+     * 
+     * @param string $path
+     * @param string $mimeTypeSuffix
+     * @return string
      */
-    private function getFilePath($path, $mimeTypeSuffix) {
-        
+    private function getFilePath($path, $mimeTypeSuffix)
+    {
         $mimeTypePath = '';
         
         if ($mimeTypeSuffix === true) {
@@ -105,13 +139,15 @@ final class File {
     }
     
     /**
-     * Gets the filename and extension of a string filename
-     * @param type $fileName
-     * @param type $name
-     * @param type $extension
+     * Sets the filename and extension
+     * 
+     * @param string $fileName
+     * @param string $name
+     * @param string $extension
+     * @return void
      */
-    private function getFileName($fileName, &$name, &$extension) {
-        
+    private function getFileName($fileName, &$name, &$extension)
+    {
         $names = explode('.', $fileName);
         $realName = '';
         
@@ -127,13 +163,15 @@ final class File {
     }
     
     /**
-     * Updates the filename if necessary
-     * @param type $fileName
-     * @param type $realFileExtension
-     * @param type $realFileName
+     * Updates the file name
+     * 
+     * @param string $fileName
+     * @param string $realFileExtension
+     * @param string $realFileName
+     * @return void
      */
-    private function updateFileName(&$fileName, &$finalFileName, &$realFileExtension, &$realFileName) {
-        
+    private function updateFileName(&$fileName, &$finalFileName, &$realFileExtension, &$realFileName)
+    {
         if ($fileName !== '') {
             
             if ($fileName === 'unique') {
@@ -150,14 +188,16 @@ final class File {
     }
     
     /**
-     * Moves a file to the destination path
+     * Moves a temporary file to the destination path
+     * 
      * @param string $fileName
      * @param string $path
      * @param bool $mimeTypeSuffix
      * @param bool $overwrite
+     * @return bool|$this|null
      */
-    public function save($fileName = '', $path = 'public', $mimeTypeSuffix = true, $overwrite = false) {
-        
+    public function save($fileName = '', $path = 'public', $mimeTypeSuffix = true, $overwrite = false)
+    {
         if (empty($this->original_request['tmp_name'])) {
             
             return null;
@@ -216,11 +256,12 @@ final class File {
     
     /**
      * Deletes a file from disk
-     * @param string $file Path of the file
-     * @return boolean Delete success
+     * 
+     * @param string $file
+     * @return bool
      */
-    public function delete($file = '') {
-        
+    public function delete($file = '')
+    {
         if (empty($file)) {
             
             return false;
