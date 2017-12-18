@@ -135,6 +135,11 @@ final class RouteParser
                 $this->routeMode = $this->path[0];
                 $actionIndex = 1;
             }
+            else {
+                
+                $this->routeMode = "main";
+                $actionIndex = 0;
+            }
         }
         
         $matchingRoutes = $this->getMatchingRoutes($actionIndex);
@@ -214,12 +219,17 @@ final class RouteParser
     private function setRouteParameters($matchingRoutes, $actionIndex)
     {
         $tmpPath = $this->path;
-        $matchingPath = implode('/', array_splice($tmpPath, $actionIndex));
         
-        if (substr($matchingPath, -1, 1) === '/') {
+        if ($actionIndex > 0) {
             
-            $matchingPath = substr($matchingPath, 0, -1);
+            $matchingPath = implode('/', array_splice($tmpPath, $actionIndex));
         }
+        else {
+            
+            $matchingPath = $this->removeTrailingSlash(implode('/', $tmpPath));
+        }
+        
+        $matchingPath = $this->removeTrailingSlash($matchingPath);
         
         foreach ($matchingRoutes as $route => $controller) {
             
@@ -434,5 +444,21 @@ final class RouteParser
                 }
             }
         }
+    }
+    
+    /**
+     * Removes a trailing slash of a string
+     * 
+     * @params string $input
+     * @return string
+     */
+    private function removeTrailingSlash($input) {
+        
+        if (substr($input, -1, 1) === '/') {
+            
+            return substr($input, 0, -1);
+        }
+        
+        return $input;
     }
 }
