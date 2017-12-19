@@ -16,8 +16,8 @@ use Niuware\WebFramework\Database\MigrationManager;
 /**
  * Executes commands for the application Console mode
  */
-final class Console {
-    
+final class Console 
+{    
     /**
      * The command to execute
      * 
@@ -170,10 +170,15 @@ final class Console {
     {
         switch ($this->command) {
             
-            case 'migrations' :
+            case 'migrations':
                 $migration = new MigrationManager($this->commandOption, $this->commandArgs);
                 
                 $this->result = $migration->getResult();
+            break;
+            case 'routes':
+                $routes = new RouteManager($this->commandOption, $this->commandArgs);
+                
+                $this->result = $routes->getResult();
             break;
             default: 
                 echo sprintf("Command '%s' does not exist.\n", $this->command);
