@@ -43,7 +43,7 @@ abstract class Request
     /**
      * The request application attributes
      * 
-     * @var type 
+     * @var array 
      */
     private $app = [];
     
