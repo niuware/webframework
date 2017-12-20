@@ -83,7 +83,7 @@ class RouteManager
             if (count($this->commandArgs) > 1 && 
                     ($this->commandArgs[1] !== "json" && $this->commandArgs[1] !== "yml")) {
             
-                $this->result = "Please specify a valid file format (json or yml).";
+                $this->result = "Please specify a valid file format (json or yml).\n";
             }
             else {
                 
@@ -116,12 +116,12 @@ class RouteManager
 
                 file_put_contents('App/Config/Routes.php', $content);
 
-                $this->result = "The routes were updated successfully.";
+                $this->result = "The routes were updated successfully.\n";
             }
         }
         else {
             
-            $this->result = "The route file App/Config/routes.$format does not exist or is not accessible.";
+            $this->result = "The route file App/Config/routes.$format does not exist or is not accessible.\n";
         }
     }
     
@@ -212,7 +212,7 @@ EOD;
 
             $routes = json_decode(file_get_contents('App/Config/routes.json'), true);
             
-            $this->result = "Error while parsing the routes.json file.";
+            $this->result = "Error while parsing the routes.json file.\n";
         }
         else if ($format === "yml") {
 
@@ -222,8 +222,9 @@ EOD;
 
             } catch (ParseException $ex) {
 
-                $error = "Error while parsing the routes.yml file.\n\n";
+                $error = "Error while parsing the routes.yml file.\n";
                 $error.= $ex->getMessage();
+                $error.= "\n";
 
                 $this->result = $error;
             }
