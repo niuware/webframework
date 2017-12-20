@@ -1,6 +1,7 @@
 {
     "name": "niuware/webframework",
     "type": "library",
+    "bin": "nwf",
     "description": "Lightweight and ready to use PHP framework for developing full MVC and MVP web applications.",
     "keywords": ["framework", "php"],
     "homepage": "https://github.com/niuware/web-framework",
