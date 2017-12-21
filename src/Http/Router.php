@@ -117,14 +117,23 @@ class Router
      * @var string 
      */
     private $routeMode = "main";
+    
+    /**
+     * The application language settings
+     * 
+     * @var array 
+     */
+    private $language;
 
     /**
      * Initializes the Router
      * 
      * @return void
      */
-    public function __construct()
+    public function __construct($language)
     {
+        $this->language = $language;
+        
         $this->initialize();
 
         $this->redirectFail();
@@ -487,7 +496,8 @@ class Router
                                 'controller' => $this->routeController,
                                 'action' => $this->routeAction,
                                 'mode' => $this->routeMode,
-                                'requireLogin' => $this->routeRequireLogin
+                                'requireLogin' => $this->routeRequireLogin,
+                                'lang' => $this->language
                             ]
                         ], $this->routeRequest);
 

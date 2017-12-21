@@ -85,7 +85,7 @@ final class Database
                 'driver' => $database['engine'],
                 'host' => $database['host'],
                 'port' => $database['port'],
-                'database' => $database['schema'],
+                'database' => \App\Config\DB_LANG . $database['schema'],
                 'prefix' => $database['prefix'],
                 'username' => $database['user'],
                 'password' => $database['pass'],

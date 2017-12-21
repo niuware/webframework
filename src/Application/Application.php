@@ -74,7 +74,6 @@ final class Application
      */
     private function __construct()
     {
-        
         spl_autoload_register(null, false);
         spl_autoload_register(__NAMESPACE__ . "\Autoloader::core");
     }
@@ -90,7 +89,7 @@ final class Application
 
         $this->setLanguage();
 
-        $this->router = new Router();
+        $this->router = new Router($this->language);
         
         try {
             
@@ -143,11 +142,12 @@ final class Application
      */
     private function setLanguage($lang = 'default')
     {
-
         $this->language = \App\Config\Settings::$languages[$lang];
 
         define("App\Config\BASE_LANG", $this->language['prefix']);
         define("App\Config\DB_LANG", $this->language['db_prefix']);
+        
+        setlocale(\LC_ALL, $this->language['code']);
     }
     
     /**
