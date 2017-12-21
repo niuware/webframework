@@ -9,7 +9,7 @@
  * https://github.com/niuware/web-framework
  */
 
-namespace Niuware\WebFramework\Http;
+namespace Niuware\WebFramework\Router;
 
 use App\Config\Routes;
 

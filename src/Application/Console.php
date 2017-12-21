@@ -11,6 +11,7 @@
 
 namespace Niuware\WebFramework\Application;
 
+use Niuware\WebFramework\Router\RouteManager;
 use Niuware\WebFramework\Database\MigrationManager;
 
 /**

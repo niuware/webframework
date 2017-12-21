@@ -9,9 +9,10 @@
  * https://github.com/niuware/web-framework
  */
 
-namespace Niuware\WebFramework\Http;
+namespace Niuware\WebFramework\Router;
 
 use Niuware\WebFramework\Auth\Auth;
+use Niuware\WebFramework\Http\HttpInput;
 
 use App\Config\Routes;
 
@@ -568,7 +569,7 @@ class Router
             
             return;
         }
-        else if (is_a($path, __NAMESPACE__ . '\Response')) {
+        else if (is_a($path, '\Niuware\WebFramework\Http\Response')) {
             
             $path->render();
             

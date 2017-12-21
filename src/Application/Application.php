@@ -12,7 +12,7 @@
 namespace Niuware\WebFramework\Application;
 
 use Niuware\WebFramework\Auth\Auth;
-use Niuware\WebFramework\Http\Router;
+use Niuware\WebFramework\Router\Router;
 use Niuware\WebFramework\Database\Database;
 use Niuware\WebFramework\Exception\FrameworkException;
     
@@ -25,7 +25,7 @@ final class Application
     /**
      * The Router instance
      * 
-     * @var \Niuware\WebFramework\Http\Router
+     * @var \Niuware\WebFramework\Router\Router
      */
     private $router;
 

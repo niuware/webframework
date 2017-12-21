@@ -9,7 +9,7 @@
  * https://github.com/niuware/web-framework
  */
 
-namespace Niuware\WebFramework\Application;
+namespace Niuware\WebFramework\Router;
 
 use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\Yaml\Exception\ParseException;
