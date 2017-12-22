@@ -383,9 +383,21 @@ final class Validate
             
             if ($args[1] !== null) {
                 
-                if (($this->request->has($field) && $this->request->$field !== $args[1]) || 
-                        !$this->request->has($field)){
+                $validValues = explode(',', $args[1]);
+                $validation = true;
                 
+                if (count($validValues) > 1) {
+                    
+                    $validation = in_array($this->request->$field, $validValues);
+                }
+                else {
+                    
+                    $validation = $this->request->$field === $args[1];
+                }
+                
+                if (($this->request->has($field) && !$validation) || 
+                        !$this->request->has($field)){
+
                     $this->request->$field = $msg;
                 }
             }
