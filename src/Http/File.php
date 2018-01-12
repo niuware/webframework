@@ -97,13 +97,13 @@ final class File
     {
         $mimeTypePath = '';
         
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+            
+        $this->filetype = finfo_file($finfo, $this->original_request['tmp_name']);
+        
         if ($mimeTypeSuffix === true) {
             
             $subpath = 'other/';
-            
-            $finfo = finfo_open(FILEINFO_MIME_TYPE);
-            
-            $this->filetype = finfo_file($finfo, $this->original_request['tmp_name']);
             
             if (strpos($this->filetype, 'image') !== false) {
                 
