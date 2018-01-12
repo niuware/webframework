@@ -101,6 +101,8 @@ final class File
             
         $this->filetype = finfo_file($finfo, $this->original_request['tmp_name']);
         
+        finfo_close($finfo);
+        
         if ($mimeTypeSuffix === true) {
             
             $subpath = 'other/';
