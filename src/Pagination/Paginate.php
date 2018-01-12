@@ -230,12 +230,20 @@ final class Paginate
             }
             else {
                 
-                $html.= $this->renderEllipsisItem($itemClass, $linkClass);
+                if (($start + 1) > 2) {
+                    
+                    $html.= $this->renderEllipsisItem($itemClass, $linkClass);
+                }
             }
+        }
+        
+        if ($start === 1) {
+            
+            $start+= 1;
         }
 
         for ($i = $start; $i <= $end; $i++) {
-
+            
             $html.= $this->renderItem($i, $itemClass, $activeClass, $linkClass);
         }
 
