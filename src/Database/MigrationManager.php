@@ -125,16 +125,17 @@ final class MigrationManager
             'migration_base_class' => 'Niuware\WebFramework\Database\Migration',
             'environments' => [
                 'default_migration_table' => 'migrations_log',
-                'default_database' => Settings::$databases['default']['schema'],
-                Settings::$databases['default']['schema'] => [
+                'default_database' => \App\Config\DB_LANG . Settings::$databases['default']['schema'],
+                \App\Config\DB_LANG . Settings::$databases['default']['schema'] => [
                     'adapter' => Settings::$databases['default']['engine'],
                     'host' => Settings::$databases['default']['host'],
-                    'name' => Settings::$databases['default']['schema'],
+                    'name' => \App\Config\DB_LANG . Settings::$databases['default']['schema'],
                     'user' => Settings::$databases['default']['user'],
                     'pass' => Settings::$databases['default']['pass'],
                     'port' => Settings::$databases['default']['port'],
                     'charset' => Settings::$databases['default']['charset'],
-                    'collation' => Settings::$databases['default']['collation']
+                    'collation' => Settings::$databases['default']['collation'],
+                    'table_prefix' => Settings::$databases['default']['prefix']
                 ]
             ]
         ];
