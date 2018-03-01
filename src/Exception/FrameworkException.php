@@ -107,15 +107,17 @@ final class FrameworkException extends \Exception
     private function getAll()
     {
         $count = 2;
-        $body = $this->getBody($this, 1);      
+        $body = $this->getBody($this, 1);     
         
-        $previous = $this->getPrevious();
-        
-        while ($previous !== null) {
-            
-            $body.= $this->getBody($previous, $count++);
-            
-            $previous = $previous->getPrevious();
+        if (\App\Config\DEBUG_MODE === true) {
+            $previous = $this->getPrevious();
+
+            while ($previous !== null) {
+
+                $body.= $this->getBody($previous, $count++);
+
+                $previous = $previous->getPrevious();
+            }
         }
         
         return $body;
@@ -168,21 +170,35 @@ EOD;
         <div style="font-size:1.5em;font-weight:lighter;padding:40px 30px;background-color:#f7f7f7;color:#4b4b4b;border-top:0;border-radius:5px 5px 0 0;border-bottom:1px dashed #ebebeb;">
             <div style="font-size:0.7em;color:#666666;">
 EOD;
-        $template.= get_class($exception);
+        if (\App\Config\DEBUG_MODE === true) {
+            $template.= get_class($exception);
+        }
+        else {
+            $template.= "Exception";
+        }
         $template.=
 <<<EOD
         (code: {$exception->getCode()})
             </div>
-            {$count}. {$exception->getMessage()}
+EOD;
+        if (\App\Config\DEBUG_MODE === true) {
+            $template.= $count . ". " . $exception->getMessage();
+        }
+        else {
+            $template.= "This page found an exception and cannot be displayed.";
+        }
+        $template.=
+<<<EOD
         </div>
         <div style="font-size:1em;padding:30px;line-height:1.8em;color:#181818;">
+EOD;
+        if (\App\Config\DEBUG_MODE === true) {
+<<<EOD
         <div style="font-size:1.2em;margin-bottom:10px;color:#4b4b4b;">
             File: {$exception->getFile()} at line {$exception->getLine()} <br />
             Trace:
         </div>
 EOD;
-        if (\App\Config\DEBUG_MODE === true) {
-            
             if ($this->customTrace === null) {
                 $template.= nl2br($exception->getTraceAsString());
             }
@@ -191,7 +207,7 @@ EOD;
             }
         }
         else {
-            $template.= 'The trace is only visible when "debug mode" is enabled.';
+            $template.= 'The exception details are only visible when "debug mode" is enabled.';
         }
         
         $template.= '</div></div>';
