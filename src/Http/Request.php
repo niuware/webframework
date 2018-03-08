@@ -173,7 +173,7 @@ abstract class Request
         }
         else {
         
-            $headers = ""; 
+            $headers = []; 
             
             foreach (array_keys($_SERVER) as $header) {
                 
