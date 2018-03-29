@@ -117,6 +117,14 @@ final class MigrationManager
      */
     private function getConfig()
     {
+        $connection = "default";
+
+        foreach ($this->commandArgs as $arg) {
+            if (substr($arg, 0, 5) === "conn=") {
+                $connection = substr($arg, 5);
+            }
+        }
+
         return [
             'paths' => [
                 'migrations' => 'App/Migrations/Migrations',
@@ -125,17 +133,17 @@ final class MigrationManager
             'migration_base_class' => 'Niuware\WebFramework\Database\Migration',
             'environments' => [
                 'default_migration_table' => 'migrations_log',
-                'default_database' => \App\Config\DB_LANG . Settings::$databases['default']['schema'],
-                \App\Config\DB_LANG . Settings::$databases['default']['schema'] => [
-                    'adapter' => Settings::$databases['default']['engine'],
-                    'host' => Settings::$databases['default']['host'],
-                    'name' => \App\Config\DB_LANG . Settings::$databases['default']['schema'],
-                    'user' => Settings::$databases['default']['user'],
-                    'pass' => Settings::$databases['default']['pass'],
-                    'port' => Settings::$databases['default']['port'],
-                    'charset' => Settings::$databases['default']['charset'],
-                    'collation' => Settings::$databases['default']['collation'],
-                    'table_prefix' => Settings::$databases['default']['prefix']
+                'default_database' => $connection,
+                $connection => [
+                    'adapter' => Settings::$databases[$connection]['engine'],
+                    'host' => Settings::$databases[$connection]['host'],
+                    'name' => \App\Config\DB_LANG . Settings::$databases[$connection]['schema'],
+                    'user' => Settings::$databases[$connection]['user'],
+                    'pass' => Settings::$databases[$connection]['pass'],
+                    'port' => Settings::$databases[$connection]['port'],
+                    'charset' => Settings::$databases[$connection]['charset'],
+                    'collation' => Settings::$databases[$connection]['collation'],
+                    'table_prefix' => Settings::$databases[$connection]['prefix']
                 ]
             ]
         ];
