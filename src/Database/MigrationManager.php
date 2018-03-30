@@ -51,6 +51,13 @@ final class MigrationManager
      * @var string 
      */
     private $result;
+
+    /**
+     * The connection name to use
+     * 
+     * @var string
+     */
+    private $connection;
     
     /**
      * All available commands
@@ -117,11 +124,15 @@ final class MigrationManager
      */
     private function getConfig()
     {
-        $connection = "default";
+        $this->connection = "default";
 
         foreach ($this->commandArgs as $arg) {
             if (substr($arg, 0, 5) === "conn=") {
-                $connection = substr($arg, 5);
+                $conn = substr($arg, 5);
+                if (isset(Settings::$databases[$conn])) {
+                    $this->connection = $conn;
+                    break;
+                }
             }
         }
 
@@ -133,17 +144,17 @@ final class MigrationManager
             'migration_base_class' => 'Niuware\WebFramework\Database\Migration',
             'environments' => [
                 'default_migration_table' => 'migrations_log',
-                'default_database' => $connection,
-                $connection => [
-                    'adapter' => Settings::$databases[$connection]['engine'],
-                    'host' => Settings::$databases[$connection]['host'],
-                    'name' => \App\Config\DB_LANG . Settings::$databases[$connection]['schema'],
-                    'user' => Settings::$databases[$connection]['user'],
-                    'pass' => Settings::$databases[$connection]['pass'],
-                    'port' => Settings::$databases[$connection]['port'],
-                    'charset' => Settings::$databases[$connection]['charset'],
-                    'collation' => Settings::$databases[$connection]['collation'],
-                    'table_prefix' => Settings::$databases[$connection]['prefix']
+                'default_database' => $this->connection,
+                $this->connection => [
+                    'adapter' => Settings::$databases[$this->connection]['engine'],
+                    'host' => Settings::$databases[$this->connection]['host'],
+                    'name' => \App\Config\DB_LANG . Settings::$databases[$this->connection]['schema'],
+                    'user' => Settings::$databases[$this->connection]['user'],
+                    'pass' => Settings::$databases[$this->connection]['pass'],
+                    'port' => Settings::$databases[$this->connection]['port'],
+                    'charset' => Settings::$databases[$this->connection]['charset'],
+                    'collation' => Settings::$databases[$this->connection]['collation'],
+                    'table_prefix' => Settings::$databases[$this->connection]['prefix']
                 ]
             ]
         ];
@@ -206,7 +217,8 @@ final class MigrationManager
     private function migrate(PhinxApplication $app, Config $config, $stream)
     {
         $command = [
-            'command' => 'migrate'
+            'command' => 'migrate',
+            '-e' => $this->connection
         ];
         
         $this->setCommandArguments($command);

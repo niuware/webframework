@@ -37,9 +37,16 @@ class Migration extends AbstractMigration
      * @return void
      */
     public function init() {
+
+        $options = $this->getInput()->getOptions();
+
+        $connection = null;
+        if (isset($options['environment']) && $options['environment'] !== "") {
+            $connection = $options['environment'];
+        }
         
         Database::boot();
         
-        $this->schema = \Illuminate\Database\Capsule\Manager::schema();
+        $this->schema = \Illuminate\Database\Capsule\Manager::schema($connection);
     }
 }
