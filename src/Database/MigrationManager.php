@@ -245,7 +245,8 @@ final class MigrationManager
     private function rollback(PhinxApplication $app, Config $config, $stream)
     {
         $command = [
-            'command' => 'rollback'
+            'command' => 'rollback',
+            '-e' => $this->connection
         ];
         
         $this->setCommandArguments($command);
