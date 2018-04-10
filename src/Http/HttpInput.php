@@ -137,14 +137,14 @@ final class HttpInput
             
             if (get_parent_class($requestClass) !== 'Niuware\WebFramework\Http\Request') {
                 
-                throw new \Exception("The class " . $requestClass . " does not inherit from Niuware\WebFramework\Http\Request class.");
+                throw new \Exception("The class " . $requestClass . " does not inherit from Niuware\WebFramework\Http\Request class.", 108);
             } 
             
             $implements = class_implements($requestClass);
         
             if (!in_array('Niuware\WebFramework\Http\RequestInterface', $implements)) {
                 
-                throw new \Exception("The class " . $requestClass . " does not implements the Niuware\WebFramework\Http\RequestInterface interface.");
+                throw new \Exception("The class " . $requestClass . " does not implements the Niuware\WebFramework\Http\RequestInterface interface.", 109);
             }
             
             $requestObj = new $requestClass($params, $this->requestMethod);

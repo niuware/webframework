@@ -105,19 +105,19 @@ final class File
         
         if ($mimeTypeSuffix === true) {
             
-            $subpath = 'other/';
+            $mimeTypePath = 'other/';
             
             if (strpos($this->filetype, 'image') !== false) {
                 
-                $subpath = 'image/';
+                $mimeTypePath = 'image/';
             }
             elseif (strpos($this->filetype, 'video') !== false) {
                 
-                $subpath = 'video/';
+                $mimeTypePath = 'video/';
             }
             elseif (strpos($this->filetype, 'audio') !== false) {
                 
-                $subpath = 'audio/';
+                $mimeTypePath = 'audio/';
             }
         }
         

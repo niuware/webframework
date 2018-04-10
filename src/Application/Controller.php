@@ -126,7 +126,7 @@ abstract class Controller {
         
         if (!file_exists($pathToView . $this->view)) {
             
-            throw new \Exception("The view '$this->view' does not exist.", 106);
+            throw new \Exception("The view '$this->view' does not exist.", 101);
         }
         
         if ($this->renderer === 'twig') {
