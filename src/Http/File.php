@@ -12,6 +12,7 @@
 namespace Niuware\WebFramework\Http;
 
 use Niuware\WebFramework\Auth\Security;
+use Niuware\WebFramework\Exception\FrameworkException;
 
 /**
  * File handling
@@ -148,7 +149,7 @@ final class File
      * @param string $extension
      * @return void
      */
-    private function getFileName($fileName, &$name, &$extension)
+    private function getFileName($fileName, &$name, &$extension, $allowedExtensions)
     {
         $names = explode('.', $fileName);
         $realName = '';
@@ -161,7 +162,11 @@ final class File
         }
         
         $name = $realName;
-        $extension = $names[$lastDot];
+        $extension = null;
+
+        if (empty($allowedExtensions) || in_array($names[$lastDot], $allowedExtensions)) {
+            $extension = $names[$lastDot];
+        }
     }
     
     /**
@@ -198,7 +203,8 @@ final class File
      * @param bool $overwrite
      * @return bool|$this|null
      */
-    public function save($fileName = '', $path = 'public', $mimeTypeSuffix = true, $overwrite = false)
+    public function save($fileName = '', $path = 'public', $mimeTypeSuffix = true, 
+                         $overwrite = false, $allowedExtensions = [])
     {
         if (empty($this->original_request['tmp_name'])) {
             
@@ -210,7 +216,12 @@ final class File
         $realFileName = '';
         $realFileExtension = '';
 
-        $this->getFileName($finalFileName, $realFileName, $realFileExtension);
+        $this->getFileName($finalFileName, $realFileName, $realFileExtension, $allowedExtensions);
+
+        if ($realFileExtension === null) {
+
+            throw new FrameworkException("The provided file extension is not allowed.", 110);
+        }
         
         $this->updateFileName($fileName, $finalFileName, $realFileExtension, $realFileName);
         
@@ -220,7 +231,7 @@ final class File
 
             if (!mkdir($uploadPath, 0777, true)) {
                 
-                return false;
+                throw new FrameworkException("The file path " . $uploadPath . " could not be created. Verify the access permissions.", 111);
             }
         }
         
