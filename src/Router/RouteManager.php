@@ -243,6 +243,6 @@ EOD;
     {
         $stringValue = var_export($input, true);
         
-        return str_replace(["array (", "Array (", ")"], ["[", "[", "]"], $stringValue);
+        return str_replace(["array (", "Array (", ")", "NULL"], ["[", "[", "]", "[]"], $stringValue);
     }
 }
