@@ -155,6 +155,7 @@ final class File
         $realName = '';
         
         $lastDot = count($names) - 1;
+        $originExtension = strtolower($names[$lastDot]);
         
         for ($i = 0; $i < $lastDot; $i++) {
             
@@ -164,8 +165,8 @@ final class File
         $name = $realName;
         $extension = null;
 
-        if (empty($allowedExtensions) || in_array($names[$lastDot], $allowedExtensions)) {
-            $extension = $names[$lastDot];
+        if (empty($allowedExtensions) || in_array($originExtension, $allowedExtensions)) {
+            $extension = $originExtension;
         }
     }
     
