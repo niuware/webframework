@@ -264,8 +264,10 @@ final class Validate
     private function required($field, $args, $msg)
     {
         if ($args[0] === 'required') {
+
+            $param = filter_var($args[1], \FILTER_VALIDATE_BOOLEAN);
             
-            if (!$this->request->has($field, $args[1])) {
+            if (!$this->request->has($field, $param)) {
                 
                 $this->appendError($field, $args[0], $msg);
             }
