@@ -11,7 +11,7 @@ Composer
 
 ## Installation
 
-Checkout the full documentation in [niuware.github.io](http://niuware.github.io/)
+Checkout the full documentation in [niuware.github.io](https://niuware.github.io/documentation/)
 
 ## Author
 
